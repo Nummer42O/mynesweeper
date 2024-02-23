@@ -73,7 +73,7 @@ int NewGameDialog::run(Type type, size_t &io_rows, size_t max_rows, size_t &io_c
     this->undo_button->set_sensitive(false);
   }
 
-  int response = this->run();
+  int response = Gtk::Dialog::run();
 
   io_rows = static_cast<size_t>(this->rows_widget.get_value());
   io_cols = static_cast<size_t>(this->cols_widget.get_value());

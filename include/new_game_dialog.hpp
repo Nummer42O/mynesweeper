@@ -27,9 +27,6 @@ public:
     size_t max_cols
   );
 
-private:
-  using Gtk::Dialog::run;
-
 public:
   static const int RESPONSE_UNDO = 1;
 
