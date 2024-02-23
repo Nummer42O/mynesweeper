@@ -14,12 +14,15 @@ Fell absolutely free to post Issues and PRs, but no guarantees.
 - [ ] add "no more moves" warning -> reveal certain fields on random to push game forward
 - [ ] add easy, medium, hard quickselect buttons to new game dialog
 - [ ] add additional entry for new size
-- [ ] check if it might be better to use new game dialog from application
+- [X] check if it might be better to use new game dialog from application
+- [ ] save preferences (window size, window mode, window location, last field size, etc) <!-- ref: https://developer-old.gnome.org/glibmm/stable/classGio_1_1Settings.html
+- [ ] make .deb package
 
 ## Requirements
 
 - Boost: 1.73
 - gtkmm: 3.0
+- glibmm: 2.4
 - PkgConfig: 0.29
 
 ## Installation
