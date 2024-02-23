@@ -32,10 +32,9 @@ public:
     size_t max_cols
   );
 
-public:
+private:
   static const int RESPONSE_UNDO = 1;
 
-private:
   MW_DECLARE_LOGGER;
 
   Gtk::HScale rows_widget, cols_widget;
