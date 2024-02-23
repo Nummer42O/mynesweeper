@@ -1,6 +1,7 @@
 #pragma once
 
 #include "window.hpp"
+#include "new_game_dialog.hpp"
 #include "no_moves_left_dialog.hpp"
 #include "logic.hpp"
 #include "debug.hpp"
@@ -10,6 +11,12 @@
 
 class Application : public Gtk::Application
 {
+private:
+  enum class NewGameReturnType
+  {
+    RESTART, QUIT, UNDO
+  };
+
 public:
   /**
   * Instanciate Gtk::Application to "image_manipulator.main".
@@ -46,14 +53,27 @@ private:
   void restartButtonCallbackInitial();
   void restartButtonCallback();
 
+  /**
+   * Shows dialog to make new field.
+   *
+   * @param type: what text to display in the dialog
+   * @param o_rows: output parameter for new field rows
+   * @param o_cols: output parameter for new field columns
+   *
+   * @returns wether to restart or quit, if @ref `type` is `NewGameDialog::Type::LOSE` then undo is also an option
+   */
+  NewGameReturnType showNewGame(
+    NewGameDialog::Type type,
+    size_t &o_rows,
+    size_t &o_cols
+  );
+
   bool newGame(NewGameDialog::Type type);
 
 private:
-    std::unique_ptr<Window> window = nullptr;
-    std::unique_ptr<Minefield> minefield = nullptr;
+  std::unique_ptr<Window> window = nullptr;
+  std::unique_ptr<Minefield> minefield = nullptr;
+  std::shared_ptr<NewGameDialog> new_game_dialog = nullptr;
 
-    struct
-    {
-      size_t rows, cols;
-    } current_field_size;
+  field_size_t current_field_size;
 };

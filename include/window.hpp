@@ -1,7 +1,6 @@
 #pragma once
 
 #include "defines.hpp"
-#include "new_game_dialog.hpp"
 #include "tile.hpp"
 #include "debug.hpp"
 
@@ -14,12 +13,6 @@
 
 class Window : public Gtk::Window
 {
-public:
-  enum class NewGameReturnType
-  {
-    RESTART, QUIT, UNDO
-  };
-
 public:
   Window(
     Tile::callback_t tile_clicked_callback
@@ -83,24 +76,9 @@ public:
   );
 
   /**
-   * Shows dialog to make new field.
-   *
-   * @param type: what text to display in the dialog
-   * @param o_rows: output parameter for new field rows
-   * @param o_cols: output parameter for new field columns
-   *
-   * @returns wether to restart or quit, if @ref `type` is `NewGameDialog::Type::LOSE` then undo is also an option
-   */
-  NewGameReturnType showNewGame(
-    NewGameDialog::Type type,
-    size_t &o_rows,
-    size_t &o_cols
-  );
-
-  /**
    * Calculate how many rows and columns can be put in the current window.
    */
-  void getMaxFieldSize(Gtk::Allocation &allocation);
+  field_size_t getMaxFieldSize();
 
 private:
 
@@ -114,11 +92,7 @@ private:
 
   size_t  current_mines = 0ul,
           current_max_mines;
-  struct
-  {
-    size_t rows = 0ul,
-           cols = 0ul;
-  } current_theoretical_max = {30ul, 30ul}, current_field_size;
+  field_size_t current_field_size;
 
   // 0: bomb, 1: empty, x (2-9): field nr x-2
   std::array<Glib::RefPtr<Gdk::Pixbuf>, 10ul> reveal_sprites;
@@ -131,8 +105,6 @@ private:
   Gtk::Grid field_widget;
   Gtk::Label nr_bombs_widget;
   Gtk::Button restart_widget;
-
-  std::shared_ptr<NewGameDialog> new_game_dialog;
 
   Tile::callback_t shared_tile_clicked_callback;
   sigc::connection restart_button_callback_connection;

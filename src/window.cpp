@@ -49,10 +49,6 @@ Window::Window(Tile::callback_t tile_clicked_callback):
   controls_box->pack_start(this->nr_bombs_widget, Gtk::PACK_SHRINK);
   this->restart_widget = Gtk::Button("Start new game");
   controls_box->pack_end(this->restart_widget, Gtk::PACK_SHRINK);
-
-  this->field_widget.signal_size_allocate().connect(sigc::mem_fun1(*this, &Window::getMaxFieldSize));
-
-  this->new_game_dialog = std::make_shared<NewGameDialog>(*this);
 }
 
 void Window::bindRestartButtonCallback(sigc::slot<void> &&callback)
@@ -139,46 +135,7 @@ void Window::setFieldFlag(size_t row, size_t col, bool flag)
   }
 }
 
-Window::NewGameReturnType Window::showNewGame(NewGameDialog::Type type, size_t &o_rows, size_t &o_cols)
-{
-  MW_SET_FUNC_SCOPE;
-
-  int dialog_response = this->new_game_dialog->run(type,
-    o_rows, this->current_theoretical_max.rows,
-    o_cols, this->current_theoretical_max.cols
-  );
-
-  this->new_game_dialog->hide();
-
-  NewGameReturnType result;
-  switch (dialog_response)
-  {
-  case Gtk::RESPONSE_OK:
-    MW_LOG(trace) << "new game dialog returned ok";
-
-    result = NewGameReturnType::RESTART;
-    break;
-  case Gtk::RESPONSE_CLOSE:
-    MW_LOG(trace) << "new game dialog returned close";
-
-    result = NewGameReturnType::QUIT;
-    break;
-  case NewGameDialog::RESPONSE_UNDO:
-    MW_LOG(trace) << "new game dialog returned undo";
-
-    result = NewGameReturnType::UNDO;
-    break;
-  default:
-    MW_LOG(error) << "unkown/-expected dialog return value: " << dialog_response << std::endl;
-
-    result = NewGameReturnType::QUIT;
-    break;
-  }
-
-  return result;
-}
-
-void Window::getMaxFieldSize(Gtk::Allocation &allocation)
+field_size_t Window::getMaxFieldSize()
 {
   MW_SET_FUNC_SCOPE;
 
@@ -188,16 +145,7 @@ void Window::getMaxFieldSize(Gtk::Allocation &allocation)
   int width  = scrolled_base->get_width(),
       height = scrolled_base->get_height();
 
-  // std::cout << "window width:  " << std::setw(4) << this->get_width()  << " (" << this->get_allocated_width()  << ")\n"
-  //              "       height: " << std::setw(4) << this->get_height() << " (" << this->get_allocated_height() << ")\n"
-  //              "field  width:  " << std::setw(3) << width  << " (" << scrolled_base->get_allocated_width()  << ")\n"
-  //              "       height: " << std::setw(3) << height << " (" << scrolled_base->get_allocated_height() << ")\n";
-
-  this->current_theoretical_max.rows = (height - SPACING) / (SPACING + TILE_SIZE);
-  this->current_theoretical_max.cols = (width - SPACING) / (SPACING + TILE_SIZE);
-
-  // MW_LOG(trace) << "new max rows: " << std::setw(3) << this->current_theoretical_max.rows << " ";
-  //                  "new max cols: " << std::setw(3) << this->current_theoretical_max.cols;
+  return field_size_t{(height - SPACING) / (SPACING + TILE_SIZE), (width - SPACING) / (SPACING + TILE_SIZE)};
 }
 
 size_t Window::getFieldPosition(size_t row, size_t col)

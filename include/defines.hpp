@@ -1,12 +1,14 @@
 #pragma once
 
+#include <cstddef>
 
-#define SPACING 5
 
-#define TILE_SIZE 50
+#define SPACING 5ul
 
-#define MIN_FIELD_ROWS 10
-#define MIN_FIELD_COLS 10
+#define TILE_SIZE 50ul
+
+#define MIN_FIELD_ROWS 10ul
+#define MIN_FIELD_COLS 10ul
 
 /*
 #define COLOR_FIELD_1 "ddfac3"
@@ -22,7 +24,7 @@
 
 #define DEFAULT_BOMB_FACTOR .1563
 
-#define MIN_INITIAL_FIELDS 3
+#define MIN_INITIAL_FIELDS 3ul
 
 
 #ifndef PROGRAM_NAME
@@ -37,3 +39,10 @@
 #ifndef SPRITE_DIRECTORY
 #error No sprite directory defined.
 #endif // !defined(SPRITE_DIRECTORY)
+
+typedef struct
+{
+  size_t
+    rows = 0ul,
+    cols = 0ul;
+} field_size_t;
