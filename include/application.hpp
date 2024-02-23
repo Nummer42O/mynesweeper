@@ -11,12 +11,6 @@
 
 class Application : public Gtk::Application
 {
-private:
-  enum class NewGameReturnType
-  {
-    RESTART, QUIT, UNDO
-  };
-
 public:
   /**
   * Instanciate Gtk::Application to "image_manipulator.main".
@@ -62,7 +56,7 @@ private:
    *
    * @returns wether to restart or quit, if @ref `type` is `NewGameDialog::Type::LOSE` then undo is also an option
    */
-  NewGameReturnType showNewGame(
+  NewGameDialog::ReturnType showNewGame(
     NewGameDialog::Type type,
     size_t &o_rows,
     size_t &o_cols
@@ -73,7 +67,9 @@ private:
 private:
   std::unique_ptr<Window> window = nullptr;
   std::unique_ptr<Minefield> minefield = nullptr;
+
   std::shared_ptr<NewGameDialog> new_game_dialog = nullptr;
+  std::shared_ptr<NoMovesLeftDialog> no_moves_left_dialog = nullptr;
 
   field_size_t current_field_size;
 };

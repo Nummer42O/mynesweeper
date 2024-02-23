@@ -16,10 +16,15 @@ public:
     INVALID
   };
 
+  enum class ReturnType
+  {
+    RESTART, QUIT, UNDO
+  };
+
 public:
   NewGameDialog(Gtk::Window &parent);
 
-  int run(
+  ReturnType run(
     Type type,
     size_t &io_rows,
     size_t max_rows,

@@ -52,7 +52,7 @@ NewGameDialog::NewGameDialog(Gtk::Window &parent):
   this->add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
 }
 
-int NewGameDialog::run(Type type, size_t &io_rows, size_t max_rows, size_t &io_cols, size_t max_cols)
+NewGameDialog::ReturnType NewGameDialog::run(Type type, size_t &io_rows, size_t max_rows, size_t &io_cols, size_t max_cols)
 {
   MW_SET_FUNC_SCOPE;
 
@@ -73,10 +73,35 @@ int NewGameDialog::run(Type type, size_t &io_rows, size_t max_rows, size_t &io_c
     this->undo_button->set_sensitive(false);
   }
 
-  int response = Gtk::Dialog::run();
+  int dialog_response = Gtk::Dialog::run();
 
   io_rows = static_cast<size_t>(this->rows_widget.get_value());
   io_cols = static_cast<size_t>(this->cols_widget.get_value());
 
-  return response;
+  ReturnType result;
+  switch (dialog_response)
+  {
+  case Gtk::RESPONSE_OK:
+    MW_LOG(trace) << "new game dialog returned ok";
+
+    result = ReturnType::RESTART;
+    break;
+  case Gtk::RESPONSE_CLOSE:
+    MW_LOG(trace) << "new game dialog returned close";
+
+    result = ReturnType::QUIT;
+    break;
+  case NewGameDialog::RESPONSE_UNDO:
+    MW_LOG(trace) << "new game dialog returned undo";
+
+    result = ReturnType::UNDO;
+    break;
+  default:
+    MW_LOG(error) << "unkown/-expected dialog return value: " << dialog_response << std::endl;
+
+    result = ReturnType::QUIT;
+    break;
+  }
+
+  return result;
 }

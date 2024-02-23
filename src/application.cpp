@@ -32,6 +32,7 @@ void Application::on_activate()
   }
 
   this->new_game_dialog = std::make_shared<NewGameDialog>(*(this->window));
+  // this->no_moves_left_dialog = std::make_shared<NoMovesLeftDialog>(*(this->window));
 
   this->add_window(*(this->window));
 
@@ -43,9 +44,9 @@ void Application::restartButtonCallbackInitial()
 {
   MW_SET_FUNC_SCOPE;
 
-  NewGameReturnType new_game_return_type = this->showNewGame(NewGameDialog::Type::START, current_field_size.rows, current_field_size.cols);
+  NewGameDialog::ReturnType new_game_return_type = this->showNewGame(NewGameDialog::Type::START, current_field_size.rows, current_field_size.cols);
 
-  if (new_game_return_type == NewGameReturnType::QUIT)
+  if (new_game_return_type == NewGameDialog::ReturnType::QUIT)
   {
     this->quit();
   }
@@ -65,44 +66,18 @@ void Application::restartButtonCallback()
   this->newGame(NewGameDialog::Type::RESTART);
 }
 
-Application::NewGameReturnType Application::showNewGame(NewGameDialog::Type type, size_t &o_rows, size_t &o_cols)
+NewGameDialog::ReturnType Application::showNewGame(NewGameDialog::Type type, size_t &o_rows, size_t &o_cols)
 {
   MW_SET_FUNC_SCOPE;
 
   field_size_t theoretical_max = this->window->getMaxFieldSize();
-  int dialog_response = this->new_game_dialog->run(type,
+  NewGameDialog::ReturnType dialog_response = this->new_game_dialog->run(type,
     o_rows, theoretical_max.rows,
     o_cols, theoretical_max.cols
   );
-
   this->new_game_dialog->hide();
 
-  NewGameReturnType result;
-  switch (dialog_response)
-  {
-  case Gtk::RESPONSE_OK:
-    MW_LOG(trace) << "new game dialog returned ok";
-
-    result = NewGameReturnType::RESTART;
-    break;
-  case Gtk::RESPONSE_CLOSE:
-    MW_LOG(trace) << "new game dialog returned close";
-
-    result = NewGameReturnType::QUIT;
-    break;
-  case NewGameDialog::RESPONSE_UNDO:
-    MW_LOG(trace) << "new game dialog returned undo";
-
-    result = NewGameReturnType::UNDO;
-    break;
-  default:
-    MW_LOG(error) << "unkown/-expected dialog return value: " << dialog_response << std::endl;
-
-    result = NewGameReturnType::QUIT;
-    break;
-  }
-
-  return result;
+  return dialog_response;
 }
 
 bool Application::newGame(NewGameDialog::Type type)
@@ -111,13 +86,13 @@ bool Application::newGame(NewGameDialog::Type type)
 
   size_t  rows = this->current_field_size.rows,
           cols = this->current_field_size.cols;
-  NewGameReturnType new_game_return_type = this->showNewGame(type, rows, cols);
-  if (new_game_return_type == NewGameReturnType::UNDO)
+  NewGameDialog::ReturnType new_game_return_type = this->showNewGame(type, rows, cols);
+  if (new_game_return_type == NewGameDialog::ReturnType::UNDO)
   {
     return true;
   }
 
-  if (new_game_return_type == NewGameReturnType::QUIT)
+  if (new_game_return_type == NewGameDialog::ReturnType::QUIT)
   {
     this->quit();
 
