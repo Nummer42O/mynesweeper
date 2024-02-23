@@ -2,15 +2,6 @@
 
 #include "debug.hpp"
 
-/**
- * TODO:
- *  - add "auto" mode just for the sake of it
- *  - add "no more moves" warning -> reveal certain fields on random to push game forward
- *  - add easy, medium, hard quickselect buttons to new game dialog
- *  - add additional entry for new size
- *  - check if it might be better to use new game dialog from application
-*/
-
 
 typedef boost::log::trivial::severity_level loglevel_t;
 BOOST_LOG_ATTRIBUTE_KEYWORD(expr_named_scope, "Scope", boost::log::attributes::named_scope::value_type);
