@@ -1,0 +1,147 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "cmake-reset",
+      "type": "shell",
+      "group": "build",
+
+      "options": {
+        "cwd": "${workspaceFolder}/build"
+      },
+      "command": [
+        "rm",
+          "--recursive",
+          "--force",
+            "./*"
+      ],
+
+      "presentation": {
+        "echo": true,
+        "reveal": "never",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false,
+      },
+
+      "runOptions": {
+        "instanceLimit": 1,
+        "runOn": "default"
+      }
+    },
+    {
+      "label": "cmake-init-debug",
+      "type": "shell",
+      "group": "build",
+
+      "options": {
+        "cwd": "${workspaceFolder}/build"
+      },
+      "command": [
+        "cmake",
+          "-DCMAKE_BUILD_TYPE=Debug",
+          "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+          ".."
+      ],
+
+      "presentation": {
+        "echo": false,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true,
+      },
+
+      "runOptions": {
+        "instanceLimit": 1,
+        "runOn": "default"
+      }
+    },
+    {
+      "label": "cmake-init-release",
+      "type": "shell",
+      "group": "build",
+
+      "options": {
+        "cwd": "${workspaceFolder}/build"
+      },
+      "command": [
+        "cmake",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+          ".."
+      ],
+
+      "presentation": {
+        "echo": false,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true,
+      },
+
+      "runOptions": {
+        "instanceLimit": 1,
+        "runOn": "default"
+      }
+    },
+    {
+      "label": "cmake-build",
+      "type": "shell",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+
+      "options": {
+        "cwd": "${workspaceFolder}/build"
+      },
+      "command": [
+        "make", "-j"
+      ],
+
+      "presentation": {
+        "echo": false,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true,
+      },
+
+      "runOptions": {
+        "instanceLimit": 1,
+        "runOn": "default"
+      }
+    },
+    {
+      "label": "cmake-install",
+      "type": "shell",
+      "group": "build",
+
+      "options": {
+        "cwd": "${workspaceFolder}/build"
+      },
+      "command": [
+        "sudo", "make", "install"
+      ],
+
+      "presentation": {
+        "echo": false,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true,
+      },
+
+      "runOptions": {
+        "instanceLimit": 1,
+        "runOn": "default"
+      }
+    }
+  ]
+}

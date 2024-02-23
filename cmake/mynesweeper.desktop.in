@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=@_PROGRAM_NAME@
+GenericName=Minesweeper
+Exec=@_EXECUTABLE_NAME@
+Path=@_INSTALL_DIR@
+Type=Application
+Categories=Game
+Hidden=false
+Terminal=@_NEEDS_TERMINAL@
+Icon=@_EXECUTABLE_NAME@.png
