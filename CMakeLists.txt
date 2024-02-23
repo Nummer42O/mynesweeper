@@ -41,6 +41,7 @@ add_executable(${_EXECUTABLE_NAME}
   # graphics
   ${CMAKE_CURRENT_SOURCE_DIR}/src/window.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/new_game_dialog.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/no_moves_left_dialog.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/tile.cpp
   # logic
   ${CMAKE_CURRENT_SOURCE_DIR}/src/logic.cpp

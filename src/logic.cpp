@@ -207,6 +207,8 @@ bool Minefield::checkHasAvailableMoves()
     }
   }
 
+  MW_LOG(warning) << "No more available moves.";
+
   return false;
 }
 

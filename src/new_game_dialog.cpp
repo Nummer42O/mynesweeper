@@ -91,7 +91,7 @@ NewGameDialog::ReturnType NewGameDialog::run(Type type, size_t &io_rows, size_t 
 
     result = ReturnType::QUIT;
     break;
-  case NewGameDialog::RESPONSE_UNDO:
+  case this->RESPONSE_UNDO:
     MW_LOG(trace) << "new game dialog returned undo";
 
     result = ReturnType::UNDO;

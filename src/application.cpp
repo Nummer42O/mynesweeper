@@ -32,7 +32,7 @@ void Application::on_activate()
   }
 
   this->new_game_dialog = std::make_shared<NewGameDialog>(*(this->window));
-  // this->no_moves_left_dialog = std::make_shared<NoMovesLeftDialog>(*(this->window));
+  this->no_moves_left_dialog = std::make_shared<NoMovesLeftDialog>(*(this->window));
 
   this->add_window(*(this->window));
 
@@ -167,12 +167,19 @@ void Application::revealCallback(size_t row, size_t col)
     {
       this->newGame(NewGameDialog::Type::WIN);
     }
-#   ifdef MW_DEBUG
     else if (!this->minefield->checkHasAvailableMoves())
     {
-      MW_LOG(error) << "No more available moves.";
+      NoMovesLeftDialog::ReturnType response = this->no_moves_left_dialog->run();
+
+      if (response == NoMovesLeftDialog::ReturnType::YES)
+      {
+        // TODO
+      }
+      else if (response == NoMovesLeftDialog::ReturnType::RESTART)
+      {
+        this->newGame(NewGameDialog::Type::RESTART);
+      }
     }
-#   endif // defined(MW_DEBUG)
   }
 }
 
@@ -189,10 +196,17 @@ void Application::flagCallback(size_t row, size_t col)
   {
     this->newGame(NewGameDialog::Type::WIN);
   }
-# ifdef MW_DEBUG
   else if (!this->minefield->checkHasAvailableMoves())
   {
-    MW_LOG(error) << "No more available moves.";
+      NoMovesLeftDialog::ReturnType response = this->no_moves_left_dialog->run();
+
+      if (response == NoMovesLeftDialog::ReturnType::YES)
+      {
+        // TODO
+      }
+      else if (response == NoMovesLeftDialog::ReturnType::RESTART)
+      {
+        this->newGame(NewGameDialog::Type::RESTART);
+      }
   }
-# endif // defined(MW_DEBUG)
 }
