@@ -22,7 +22,7 @@ else()
 endif()
 
 # use the package PkgConfig to detect GTK+ headers/library files
-find_package(PkgConfig REQUIRED)
+find_package(PkgConfig 0.29 REQUIRED)
 pkg_check_modules(
   GTKMM
   IMPORTED_TARGET
