@@ -17,6 +17,9 @@ Fell absolutely free to post Issues and PRs, but no guarantees.
 - [X] check if it might be better to use new game dialog from application
 - [ ] save preferences (window size, window mode, window location, last field size, etc) <!-- ref: https://developer-old.gnome.org/glibmm/stable/classGio_1_1Settings.html
 - [ ] make .deb package
+- [ ] keyboard callbacks
+- [ ] restart button should initially be called start
+- [ ] start new game dialog automatically
 
 ## Requirements
 
