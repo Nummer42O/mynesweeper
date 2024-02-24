@@ -62,6 +62,8 @@ private:
     size_t &o_cols
   );
 
+  NoMovesLeftDialog::ReturnType showNoMovesLeft();
+
   bool newGame(NewGameDialog::Type type);
 
 private:

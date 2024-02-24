@@ -80,6 +80,14 @@ NewGameDialog::ReturnType Application::showNewGame(NewGameDialog::Type type, siz
   return dialog_response;
 }
 
+NoMovesLeftDialog::ReturnType Application::showNoMovesLeft()
+{
+  NoMovesLeftDialog::ReturnType dialog_response = this->no_moves_left_dialog->run();
+  this->no_moves_left_dialog->hide();
+
+  return dialog_response;
+}
+
 bool Application::newGame(NewGameDialog::Type type)
 {
   MW_SET_FUNC_SCOPE;
@@ -169,11 +177,12 @@ void Application::revealCallback(size_t row, size_t col)
     }
     else if (!this->minefield->checkHasAvailableMoves())
     {
-      NoMovesLeftDialog::ReturnType response = this->no_moves_left_dialog->run();
+      NoMovesLeftDialog::ReturnType response = this->showNoMovesLeft();
 
       if (response == NoMovesLeftDialog::ReturnType::YES)
       {
         // TODO
+        MW_LOG(info) << "User wants help";
       }
       else if (response == NoMovesLeftDialog::ReturnType::RESTART)
       {
@@ -198,11 +207,12 @@ void Application::flagCallback(size_t row, size_t col)
   }
   else if (!this->minefield->checkHasAvailableMoves())
   {
-      NoMovesLeftDialog::ReturnType response = this->no_moves_left_dialog->run();
+      NoMovesLeftDialog::ReturnType response = this->showNoMovesLeft();
 
       if (response == NoMovesLeftDialog::ReturnType::YES)
       {
         // TODO
+        MW_LOG(info) << "User wants help";
       }
       else if (response == NoMovesLeftDialog::ReturnType::RESTART)
       {
