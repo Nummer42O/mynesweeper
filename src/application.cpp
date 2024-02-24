@@ -15,6 +15,9 @@ Application::Application():
   MW_SET_FUNC_SCOPE;
 }
 
+
+/* #region Application internal */
+
 void Application::on_activate()
 {
   MW_SET_FUNC_SCOPE;
@@ -23,7 +26,7 @@ void Application::on_activate()
     sigc::mem_fun3(*this, &Application::clickedCallback)
   );
   this->window->bindRestartButtonCallback(
-    sigc::mem_fun0(*this, &Application::restartButtonCallbackInitial)
+    sigc::mem_fun0(*this, &Application::startGame)
   );
 
   if (!this->window->loadSprites())
@@ -40,31 +43,8 @@ void Application::on_activate()
   this->window->maximize();
 }
 
-void Application::restartButtonCallbackInitial()
-{
-  MW_SET_FUNC_SCOPE;
-
-  NewGameDialog::ReturnType new_game_return_type = this->showNewGame(NewGameDialog::Type::START, current_field_size.rows, current_field_size.cols);
-
-  if (new_game_return_type == NewGameDialog::ReturnType::QUIT)
-  {
-    this->quit();
-  }
-
-  this->minefield = std::make_unique<Minefield>(current_field_size.rows, current_field_size.cols);
-  this->window->generateMinefield(current_field_size.rows, current_field_size.cols, this->minefield->getNrMines());
-
-  this->window->bindRestartButtonCallback(
-    sigc::mem_fun0(*this, &Application::restartButtonCallback)
-  );
-}
-
-void Application::restartButtonCallback()
-{
-  MW_SET_FUNC_SCOPE;
-
-  this->newGame(NewGameDialog::Type::RESTART);
-}
+/* #endregion */
+/* #region Dialog Handlers */
 
 NewGameDialog::ReturnType Application::showNewGame(NewGameDialog::Type type, size_t &o_rows, size_t &o_cols)
 {
@@ -88,66 +68,8 @@ NoMovesLeftDialog::ReturnType Application::showNoMovesLeft()
   return dialog_response;
 }
 
-bool Application::newGame(NewGameDialog::Type type)
-{
-  MW_SET_FUNC_SCOPE;
-
-  size_t  rows = this->current_field_size.rows,
-          cols = this->current_field_size.cols;
-  NewGameDialog::ReturnType new_game_return_type = this->showNewGame(type, rows, cols);
-  if (new_game_return_type == NewGameDialog::ReturnType::UNDO)
-  {
-    return true;
-  }
-
-  if (new_game_return_type == NewGameDialog::ReturnType::QUIT)
-  {
-    this->quit();
-
-    return false;
-  }
-
-  MW_LOG(debug) << "current: rows=" << this->current_field_size.rows << " cols=" << this->current_field_size.cols;
-  MW_LOG(debug) << "new:     rows=" << rows                          << " cols=" << cols;
-  if (this->current_field_size.rows == rows && this->current_field_size.cols == cols)
-  {
-    this->minefield->reset();
-    this->window->resetMinefield();
-  }
-  else
-  {
-    this->minefield->resize(rows, cols);
-    this->window->generateMinefield(rows, cols, this->minefield->getNrMines());
-
-    this->current_field_size = {rows, cols};
-  }
-
-  return false;
-}
-
-void Application::checkGameWon()
-{
-  if (this->minefield->checkGameWon())
-  {
-    this->newGame(NewGameDialog::Type::WIN);
-  }
-  else if (!this->minefield->checkHasAvailableMoves())
-  {
-    NoMovesLeftDialog::ReturnType response = this->showNoMovesLeft();
-
-    if (response == NoMovesLeftDialog::ReturnType::YES)
-    {
-      Minefield::cascade_t cascade;
-      this->minefield->revealFieldsForUser(cascade);
-
-      for (const Minefield::tile_with_position_t &tile: cascade);
-    }
-    else if (response == NoMovesLeftDialog::ReturnType::RESTART)
-    {
-      this->newGame(NewGameDialog::Type::RESTART);
-    }
-  }
-}
+/* #endregion */
+/* #region Mouse Callbacks */
 
 void Application::clickedCallback(bool is_reveal, size_t row, size_t col)
 {
@@ -195,7 +117,7 @@ void Application::revealCallback(size_t row, size_t col)
       this->window->revealField(tile.row, tile.col, tile.type);
     }
 
-    this->checkGameWon();
+    this->checkGameStatus();
   }
 }
 
@@ -208,5 +130,93 @@ void Application::flagCallback(size_t row, size_t col)
 
   this->window->setFieldFlag(row, col, is_flagged);
 
-  this->checkGameWon();
+  this->checkGameStatus();
 }
+
+/* #endregion */
+/* #region Game Control */
+
+void Application::startGame()
+{
+  MW_SET_FUNC_SCOPE;
+
+  NewGameDialog::ReturnType new_game_return_type = this->showNewGame(NewGameDialog::Type::START, current_field_size.rows, current_field_size.cols);
+
+  if (new_game_return_type == NewGameDialog::ReturnType::QUIT)
+  {
+    this->quit();
+  }
+
+  this->minefield = std::make_unique<Minefield>(current_field_size.rows, current_field_size.cols);
+  this->window->generateMinefield(current_field_size.rows, current_field_size.cols, this->minefield->getNrMines());
+
+  this->window->bindRestartButtonCallback(
+    sigc::bind(
+      sigc::mem_fun1(*this, &Application::newGame),
+      NewGameDialog::Type::START
+    )
+  );
+}
+
+bool Application::newGame(NewGameDialog::Type type)
+{
+  MW_SET_FUNC_SCOPE;
+
+  size_t  rows = this->current_field_size.rows,
+          cols = this->current_field_size.cols;
+  NewGameDialog::ReturnType new_game_return_type = this->showNewGame(type, rows, cols);
+  if (new_game_return_type == NewGameDialog::ReturnType::UNDO)
+  {
+    return true;
+  }
+
+  if (new_game_return_type == NewGameDialog::ReturnType::QUIT)
+  {
+    this->quit();
+
+    return false;
+  }
+
+  MW_LOG(debug) << "current: rows=" << this->current_field_size.rows << " cols=" << this->current_field_size.cols;
+  MW_LOG(debug) << "new:     rows=" << rows                          << " cols=" << cols;
+  if (this->current_field_size.rows == rows && this->current_field_size.cols == cols)
+  {
+    this->minefield->reset();
+    this->window->resetMinefield();
+  }
+  else
+  {
+    this->minefield->resize(rows, cols);
+    this->window->generateMinefield(rows, cols, this->minefield->getNrMines());
+
+    this->current_field_size = {rows, cols};
+  }
+
+  return false;
+}
+
+void Application::checkGameStatus()
+{
+  if (this->minefield->checkGameWon())
+  {
+    this->newGame(NewGameDialog::Type::WIN);
+  }
+  else if (!this->minefield->checkHasAvailableMoves())
+  {
+    NoMovesLeftDialog::ReturnType response = this->showNoMovesLeft();
+
+    if (response == NoMovesLeftDialog::ReturnType::YES)
+    {
+      Minefield::cascade_t cascade;
+      this->minefield->revealFieldsForUser(cascade);
+
+      for (const Minefield::tile_with_position_t &tile: cascade);
+    }
+    else if (response == NoMovesLeftDialog::ReturnType::RESTART)
+    {
+      this->newGame(NewGameDialog::Type::RESTART);
+    }
+  }
+}
+
+/* #endregion */
