@@ -22,7 +22,7 @@ const std::array<Minefield::tile_offset_t, 8ul> Minefield::offsets = {{
 
 
 Minefield::Minefield(size_t rows, size_t cols):
-  rows(rows), cols(cols)
+  current_field_size{rows, cols}
 {
   MW_SET_CLASS_ORIGIN;
   MW_SET_FUNC_SCOPE;
@@ -44,8 +44,7 @@ void Minefield::resize(size_t rows, size_t cols)
 
   MW_LOG(trace) << "resize with rows=" << rows << " cols=" << cols;
 
-  this->rows = rows;
-  this->cols = cols;
+  this->current_field_size = {rows, cols};
 
   this->field_size = rows * cols;
   this->field.resize(this->field_size);
@@ -119,7 +118,12 @@ bool Minefield::toggleFieldFlag(size_t row, size_t col, bool &o_is_flagged)
 
 void Minefield::revealFieldsForUser(cascade_t &o_revealed_fields)
 {
-  //TODO: implement
+  /**
+   * TODO: implement
+   *  1. generate list of all unrevealed tiles adjacent to revealed ones
+   *  2. iterate over those and check if revealing those would solve the problem
+   *  3. if none of those solve the problem, reveal any of them, remove it from list and repeat from 2.
+  */
 }
 
 bool Minefield::checkGameWon()
@@ -129,7 +133,7 @@ bool Minefield::checkGameWon()
   size_t
     revealed_tiles_count          = 0ul,
     correctly_flagged_mines_count = 0ul;
-  const size_t non_mine_tiles_count = this->rows * this->cols - this->nr_of_mines;
+  const size_t non_mine_tiles_count = this->field_size - this->nr_of_mines;
 
   for (const tile_t &current_tile: this->field)
   {
@@ -150,11 +154,11 @@ bool Minefield::checkHasAvailableMoves()
 {
   MW_SET_FUNC_SCOPE
 
-  for (size_t row = 0ul; row < this->rows; row++)
+  for (size_t row = 0ul; row < this->current_field_size.rows; row++)
   {
-    for (size_t col = 0ul; col < this->cols; col++)
+    for (size_t col = 0ul; col < this->current_field_size.cols; col++)
     {
-      tile_t current_tile = this->field[row * this->cols + col];
+      tile_t current_tile = this->field[row * this->current_field_size.cols + col];
 
       if (!current_tile.is_revealed || (current_tile.is_revealed && current_tile.nr_surrounding_mines == 0)) continue;
 
@@ -223,7 +227,7 @@ bool Minefield::activateFieldInitial(size_t row, size_t col, std::vector<tile_wi
   MW_LOG(trace) << "activating at row=" << row << " col=" << col;
 
   // don't even bother if the position is invalid
-  if (!(row < this->rows && col < this->cols))
+  if (!(row < this->current_field_size.rows && col < this->current_field_size.cols))
   {
     MW_LOG_INVALID_TILE;
 
@@ -314,9 +318,9 @@ bool Minefield::activateFieldInitial(size_t row, size_t col, std::vector<tile_wi
 
 # ifdef MW_DEBUG
   bool is_valid;
-  for (size_t row = 0ul; row < this->rows; row++)
+  for (size_t row = 0ul; row < this->current_field_size.rows; row++)
   {
-    for (size_t col = 0ul; col < this->cols; col++)
+    for (size_t col = 0ul; col < this->current_field_size.cols; col++)
     {
       Minefield::tile_t tile = this->getTile(Minefield::tile_position_t{row, col}, is_valid);
 
@@ -482,18 +486,18 @@ void Minefield::initFields()
   {
     this->field.at(idx).is_mine = true;
 
-    int64_t row = idx / this->cols,
-            col = idx % this->cols;
+    int64_t row = idx / this->current_field_size.cols,
+            col = idx % this->current_field_size.cols;
 
     for (const tile_offset_t offset: this->offsets)
     {
       int64_t current_row = row + offset.rows,
               current_col = col + offset.cols;
 
-      if (current_row < 0 || current_row >= this->rows ||
-          current_col < 0 || current_col >= this->cols) continue;
+      if (current_row < 0 || current_row >= this->current_field_size.rows ||
+          current_col < 0 || current_col >= this->current_field_size.cols) continue;
 
-      this->field.at(current_row * this->cols + current_col).nr_surrounding_mines++;
+      this->field.at(current_row * this->current_field_size.cols + current_col).nr_surrounding_mines++;
     }
   }
 }
@@ -509,7 +513,7 @@ Minefield::tile_t &Minefield::getTile(const tile_position_t &pos, bool &o_is_val
 {
   MW_SET_FUNC_SCOPE;
 
-  o_is_valid = (pos.row < this->rows && pos.col < this->cols);
+  o_is_valid = (pos.row < this->current_field_size.rows && pos.col < this->current_field_size.cols);
 
   if (!o_is_valid)
   {
@@ -517,7 +521,7 @@ Minefield::tile_t &Minefield::getTile(const tile_position_t &pos, bool &o_is_val
   }
   else
   {
-    return this->field[pos.row * this->cols + pos.col];
+    return this->field[pos.row * this->current_field_size.cols + pos.col];
   }
 }
 

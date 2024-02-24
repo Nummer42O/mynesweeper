@@ -193,6 +193,8 @@ private:
    */
   size_t calculateNrOfMines();
 
+  // TODO: get tile position
+
   /**
    * Checks if the indices are in bounds and returns Tile if so.
    *
@@ -225,7 +227,7 @@ public:
 private:
   MW_DECLARE_LOGGER;
 
-  size_t rows, cols;
+  field_size_t current_field_size;
   size_t nr_of_mines;
 
   size_t field_size;
