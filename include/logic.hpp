@@ -22,6 +22,8 @@ public:
     int type;
   } tile_with_position_t;
 
+  typedef std::vector<tile_with_position_t> cascade_t;
+
   enum class ToggleFieldFlagStatus
   {
     OK, INVALID_TILE, ALREADY_REVEALED
@@ -83,6 +85,15 @@ public:
   void reset();
 
   /**
+   * bool activateField(
+   *   size_t row,
+   *   size_t col,
+   *   cascade_t &o_revealed_fields,
+   *   bool &o_has_revealed_mine
+   * );
+   */
+
+  /**
    * @brief Attempts to undo revelation of field.
    *
    * @param row: row / y coordinate
@@ -108,6 +119,10 @@ public:
     size_t row,
     size_t col,
     bool &o_is_flagged
+  );
+
+  void revealFieldsForUser(
+    cascade_t &o_revealed_fields
   );
 
   /**

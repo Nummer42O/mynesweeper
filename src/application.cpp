@@ -125,6 +125,30 @@ bool Application::newGame(NewGameDialog::Type type)
   return false;
 }
 
+void Application::checkGameWon()
+{
+  if (this->minefield->checkGameWon())
+  {
+    this->newGame(NewGameDialog::Type::WIN);
+  }
+  else if (!this->minefield->checkHasAvailableMoves())
+  {
+    NoMovesLeftDialog::ReturnType response = this->showNoMovesLeft();
+
+    if (response == NoMovesLeftDialog::ReturnType::YES)
+    {
+      Minefield::cascade_t cascade;
+      this->minefield->revealFieldsForUser(cascade);
+
+      for (const Minefield::tile_with_position_t &tile: cascade);
+    }
+    else if (response == NoMovesLeftDialog::ReturnType::RESTART)
+    {
+      this->newGame(NewGameDialog::Type::RESTART);
+    }
+  }
+}
+
 void Application::clickedCallback(bool is_reveal, size_t row, size_t col)
 {
   MW_SET_FUNC_SCOPE;
@@ -171,24 +195,7 @@ void Application::revealCallback(size_t row, size_t col)
       this->window->revealField(tile.row, tile.col, tile.type);
     }
 
-    if (this->minefield->checkGameWon())
-    {
-      this->newGame(NewGameDialog::Type::WIN);
-    }
-    else if (!this->minefield->checkHasAvailableMoves())
-    {
-      NoMovesLeftDialog::ReturnType response = this->showNoMovesLeft();
-
-      if (response == NoMovesLeftDialog::ReturnType::YES)
-      {
-        // TODO
-        MW_LOG(info) << "User wants help";
-      }
-      else if (response == NoMovesLeftDialog::ReturnType::RESTART)
-      {
-        this->newGame(NewGameDialog::Type::RESTART);
-      }
-    }
+    this->checkGameWon();
   }
 }
 
@@ -201,22 +208,5 @@ void Application::flagCallback(size_t row, size_t col)
 
   this->window->setFieldFlag(row, col, is_flagged);
 
-  if (this->minefield->checkGameWon())
-  {
-    this->newGame(NewGameDialog::Type::WIN);
-  }
-  else if (!this->minefield->checkHasAvailableMoves())
-  {
-      NoMovesLeftDialog::ReturnType response = this->showNoMovesLeft();
-
-      if (response == NoMovesLeftDialog::ReturnType::YES)
-      {
-        // TODO
-        MW_LOG(info) << "User wants help";
-      }
-      else if (response == NoMovesLeftDialog::ReturnType::RESTART)
-      {
-        this->newGame(NewGameDialog::Type::RESTART);
-      }
-  }
+  this->checkGameWon();
 }

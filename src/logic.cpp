@@ -117,21 +117,18 @@ bool Minefield::toggleFieldFlag(size_t row, size_t col, bool &o_is_flagged)
   return true;
 }
 
+void Minefield::revealFieldsForUser(cascade_t &o_revealed_fields)
+{
+  //TODO: implement
+}
+
 bool Minefield::checkGameWon()
 {
   MW_SET_FUNC_SCOPE;
 
-  // for (const tile_t &current_tile: this->field)
-  // {
-  //   if (current_tile.is_revealed) continue;
-
-  //   if (current_tile.is_mine && !current_tile.is_flagged) return false;
-  // }
-
-  // return true;
-
-  size_t  revealed_tiles_count          = 0ul,
-          correctly_flagged_mines_count = 0ul;
+  size_t
+    revealed_tiles_count          = 0ul,
+    correctly_flagged_mines_count = 0ul;
   const size_t non_mine_tiles_count = this->rows * this->cols - this->nr_of_mines;
 
   for (const tile_t &current_tile: this->field)

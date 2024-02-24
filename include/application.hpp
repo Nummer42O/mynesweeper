@@ -66,6 +66,8 @@ private:
 
   bool newGame(NewGameDialog::Type type);
 
+  void checkGameWon();
+
 private:
   std::unique_ptr<Window> window = nullptr;
   std::unique_ptr<Minefield> minefield = nullptr;
