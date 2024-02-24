@@ -23,6 +23,9 @@ void logFormatter(const boost::log::record_view &record_view, boost::log::basic_
   case loglevel_t::debug:
     stream << "\033[0;94m[";
     break;
+  case loglevel_t::info:
+    stream << "\033[0;92m[";
+    break;
   case loglevel_t::warning:
     stream << "\033[0;93m[";
     break;
