@@ -151,10 +151,10 @@ void Application::startGame()
   this->window->generateMinefield(current_field_size.rows, current_field_size.cols, this->minefield->getNrMines());
 
   this->window->bindRestartButtonCallback(
-    sigc::bind(
-      sigc::mem_fun1(*this, &Application::newGame),
-      NewGameDialog::Type::START
-    )
+    [&]() -> void
+    {
+      this->newGame(NewGameDialog::Type::START);
+    }
   );
 }
 
