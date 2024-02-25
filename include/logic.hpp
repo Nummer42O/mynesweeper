@@ -10,7 +10,6 @@
 #include <optional>
 #include <sigc++/sigc++.h>
 
-
 class Minefield
 {
 public:
@@ -26,7 +25,9 @@ public:
 
   enum class ToggleFieldFlagStatus
   {
-    OK, INVALID_TILE, ALREADY_REVEALED
+    OK,
+    INVALID_TILE,
+    ALREADY_REVEALED
   };
 
 private:
@@ -44,18 +45,22 @@ private:
     size_t row, col;
   } tile_position_t;
 
-  typedef struct {
+  typedef struct
+  {
     int64_t rows, cols;
   } tile_offset_t;
 
   typedef sigc::slot<
-    bool,
-    size_t /*row*/, size_t /*col*/,
-    std::vector<tile_with_position_t> &/*o_revealed_fields*/,
-    bool &/*o_has_revealed_mine*/
-  > activate_field_callback_t;
+      bool,
+      size_t /*row*/, size_t /*col*/,
+      std::vector<tile_with_position_t> & /*o_revealed_fields*/,
+      bool & /*o_has_revealed_mine*/
+      >
+      activate_field_callback_t;
 
 public:
+  /* #region minefield generation */
+
   /**
    * Create a new minefield of given size and initialize it.
    *
@@ -63,9 +68,8 @@ public:
    * @param cols: new minefield width
    */
   Minefield(
-    size_t rows,
-    size_t cols
-  );
+      size_t rows,
+      size_t cols);
 
   /**
    * Resizes the current field to the new size if it differs.
@@ -75,14 +79,16 @@ public:
    * @param cols: new minefield width
    */
   void resize(
-    size_t rows,
-    size_t cols
-  );
+      size_t rows,
+      size_t cols);
 
   /**
    * Reininitialize the mine field with the same size as before.
    */
   void reset();
+
+  /* #endregion */
+  /* #region field manipulation */
 
   /**
    * bool activateField(
@@ -102,9 +108,8 @@ public:
    * @return true if the position was valid, false otherwise
    */
   bool undoFieldActivation(
-    size_t row,
-    size_t col
-  );
+      size_t row,
+      size_t col);
 
   /**
    * Flag or unflag the field as suspected mine.
@@ -116,14 +121,15 @@ public:
    * @returns true if o_is_flagged is valid, false otherwise
    */
   bool toggleFieldFlag(
-    size_t row,
-    size_t col,
-    bool &o_is_flagged
-  );
+      size_t row,
+      size_t col,
+      bool &o_is_flagged);
 
   void revealFieldsForUser(
-    cascade_t &o_revealed_fields
-  );
+      cascade_t &o_revealed_fields);
+
+  /* #endregion */
+  /* #region status checks */
 
   /**
    * @brief Check if all non-mine fields are revealed.
@@ -139,6 +145,9 @@ public:
    */
   bool checkHasAvailableMoves();
 
+  /* #endregion */
+  /* #region getters */
+
   /**
    * Get the number of mines for the current field.
    *
@@ -146,7 +155,19 @@ public:
    */
   const size_t &getNrMines();
 
+  /* #endregion */
+
 private:
+  /* #region minefield generation */
+
+  /**
+   * Assign random states to the fields.
+   */
+  void initFields();
+
+  /* #endregion */
+  /* #region field manipulation */
+
   /**
    * Reveals the first field and will set of a reveal cascade.
    *
@@ -158,11 +179,10 @@ private:
    * @returns true if the position was valid, false otherwise
    */
   bool activateFieldInitial(
-    size_t row,
-    size_t col,
-    std::vector<tile_with_position_t> &o_revealed_fields,
-    bool &o_has_revealed_mine
-  );
+      size_t row,
+      size_t col,
+      std::vector<tile_with_position_t> &o_revealed_fields,
+      bool &o_has_revealed_mine);
 
   /**
    * Attempts to reveal the field and may set of a reveal cascade.
@@ -175,16 +195,28 @@ private:
    * @returns true if the position was valid, false otherwise
    */
   bool activateFieldMain(
-    size_t row,
-    size_t col,
-    std::vector<tile_with_position_t> &o_revealed_fields,
-    bool &o_has_revealed_mine
-  );
+      size_t row,
+      size_t col,
+      std::vector<tile_with_position_t> &o_revealed_fields,
+      bool &o_has_revealed_mine);
+
+  /* #endregion */
+  /* #region status checks */
 
   /**
-   * Assign random states to the fields.
+   * @brief Checks wether all mines sourrnding the tile are flagged.
+   *
+   * @note It is not checked, wether this check itself makes sense or not.
+   *
+   * @param pos: position of the tile in the field
+   *
+   * @returns true if the check succeded, false otherwise
    */
-  void initFields();
+  bool checkMineCountSatisfied(
+      const tile_position_t &pos);
+
+  /* #endregion */
+  /* #region getters */
 
   /**
    * Function to calculate number of mines from field count.
@@ -204,22 +236,10 @@ private:
    * @returns the selected tile
    */
   tile_t &getTile(
-    const tile_position_t &pos,
-    bool &o_is_valid
-  );
+      const tile_position_t &pos,
+      bool &o_is_valid);
 
-  /**
-   * @brief Checks wether all mines sourrnding the tile are flagged.
-   *
-   * @note It is not checked, wether this check itself makes sense or not.
-   *
-   * @param pos: position of the tile in the field
-   *
-   * @returns true if the check succeded, false otherwise
-   */
-  bool mineCountSatisfied(
-    const tile_position_t &pos
-  );
+  /* #endregion */
 
 public:
   activate_field_callback_t activateField;
