@@ -20,6 +20,7 @@ Fell absolutely free to post Issues and PRs, but no guarantees.
 - [ ] keyboard callbacks
 - [ ] restart button should initially be called start
 - [ ] start new game dialog automatically
+- [ ] change new game dialog "Col: " to "Column: " and maybe adopt formatting/arrangement
 
 ## Requirements
 
