@@ -51,12 +51,11 @@ private:
   } tile_offset_t;
 
   typedef sigc::slot<
-      bool,
-      size_t /*row*/, size_t /*col*/,
-      std::vector<tile_with_position_t> & /*o_revealed_fields*/,
-      bool & /*o_has_revealed_mine*/
-      >
-      activate_field_callback_t;
+    bool,
+    size_t /*row*/, size_t /*col*/,
+    std::vector<tile_with_position_t> & /*o_revealed_fields*/,
+    bool & /*o_has_revealed_mine*/
+  > activate_field_callback_t;
 
 public:
   /* #region minefield generation */
@@ -68,8 +67,9 @@ public:
    * @param cols: new minefield width
    */
   Minefield(
-      size_t rows,
-      size_t cols);
+    size_t rows,
+    size_t cols
+  );
 
   /**
    * Resizes the current field to the new size if it differs.
@@ -79,8 +79,9 @@ public:
    * @param cols: new minefield width
    */
   void resize(
-      size_t rows,
-      size_t cols);
+    size_t rows,
+    size_t cols
+  );
 
   /**
    * Reininitialize the mine field with the same size as before.
@@ -105,11 +106,12 @@ public:
    * @param row: row / y coordinate
    * @param col: column / x coordinate
    *
-   * @return true if the position was valid, false otherwise
+   * @returns true if the position was valid, false otherwise
    */
   bool undoFieldActivation(
-      size_t row,
-      size_t col);
+    size_t row,
+    size_t col
+  );
 
   /**
    * Flag or unflag the field as suspected mine.
@@ -121,12 +123,14 @@ public:
    * @returns true if o_is_flagged is valid, false otherwise
    */
   bool toggleFieldFlag(
-      size_t row,
-      size_t col,
-      bool &o_is_flagged);
+    size_t row,
+    size_t col,
+    bool &o_is_flagged
+  );
 
   void revealFieldsForUser(
-      cascade_t &o_revealed_fields);
+    cascade_t &o_revealed_fields
+  );
 
   /* #endregion */
   /* #region status checks */
@@ -179,10 +183,11 @@ private:
    * @returns true if the position was valid, false otherwise
    */
   bool activateFieldInitial(
-      size_t row,
-      size_t col,
-      std::vector<tile_with_position_t> &o_revealed_fields,
-      bool &o_has_revealed_mine);
+    size_t row,
+    size_t col,
+    std::vector<tile_with_position_t> &o_revealed_fields,
+    bool &o_has_revealed_mine
+  );
 
   /**
    * Attempts to reveal the field and may set of a reveal cascade.
@@ -195,10 +200,11 @@ private:
    * @returns true if the position was valid, false otherwise
    */
   bool activateFieldMain(
-      size_t row,
-      size_t col,
-      std::vector<tile_with_position_t> &o_revealed_fields,
-      bool &o_has_revealed_mine);
+    size_t row,
+    size_t col,
+    std::vector<tile_with_position_t> &o_revealed_fields,
+    bool &o_has_revealed_mine
+  );
 
   /* #endregion */
   /* #region status checks */
@@ -208,12 +214,15 @@ private:
    *
    * @note It is not checked, wether this check itself makes sense or not.
    *
-   * @param pos: position of the tile in the field
+   * @param row row / y coordinate
+   * @param col column / x coordinate
    *
    * @returns true if the check succeded, false otherwise
    */
   bool checkMineCountSatisfied(
-      const tile_position_t &pos);
+    size_t row,
+    size_t col
+  );
 
   /* #endregion */
   /* #region getters */
@@ -225,19 +234,35 @@ private:
    */
   size_t calculateNrOfMines();
 
-  // TODO: get tile position
+  /**
+   * @brief Convert tile position to field index.
+   *
+   * @note No range checks are performed.
+   *
+   * @param row row / y coordinate
+   * @param col column / x coordinate
+   *
+   * @returns field vector index
+   */
+  inline size_t getTilePosition(
+    size_t row,
+    size_t col
+  );
 
   /**
    * Checks if the indices are in bounds and returns Tile if so.
    *
-   * @param pos: position of the tile in the field
+   * @param row row / y coordinate
+   * @param col column / x coordinate
    * @param o_is_valid: true if the position is valid, false otherwise
    *
    * @returns the selected tile
    */
   tile_t &getTile(
-      const tile_position_t &pos,
-      bool &o_is_valid);
+    size_t row,
+    size_t col,
+    bool &o_is_valid
+  );
 
   /* #endregion */
 
