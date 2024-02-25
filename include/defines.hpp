@@ -2,6 +2,7 @@
 
 #include <cstddef>
 
+/* #region graphical configs */
 
 #define SPACING 5ul
 
@@ -21,11 +22,15 @@
 #define COLOR_FIELD_8 "ed8a8a"
 */
 
+/* #endregion */
+/* #region general configs */
 
 #define DEFAULT_BOMB_FACTOR .1563
 
 #define MIN_INITIAL_FIELDS 3ul
 
+/* #endregion */
+/* #region build context */
 
 #ifndef PROGRAM_NAME
 #define PROGRAM_NAME "[UNKNOWN]"
@@ -35,10 +40,12 @@
 #error No executable name defined.
 #endif // !defined(EXECUTABLE_NAME)
 
-
 #ifndef SPRITE_DIRECTORY
 #error No sprite directory defined.
 #endif // !defined(SPRITE_DIRECTORY)
+
+/* #endregion */
+/* #region general resources */
 
 typedef struct
 {
@@ -46,3 +53,5 @@ typedef struct
     rows = 0ul,
     cols = 0ul;
 } field_size_t;
+
+/* #endregion */
