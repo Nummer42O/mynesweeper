@@ -99,18 +99,15 @@ public:
   void resetMinefield();
 
   /**
-   * @brief Update the mine counter label/display.
-   *
-   * @param nr_revealed_mines number of revealed mines
-   */
-  void setMinesDisplay(
-    size_t nr_revealed_mines
-  );
-
-  /**
    * @brief Check the soft maximum rows and columns for the current window size.
    */
   field_size_t getMaxFieldSize();
+
+private:
+  /**
+   * @brief Update the mine counter label/display.
+   */
+  void setMinesDisplay();
 
 private:
   MW_DECLARE_LOGGER;

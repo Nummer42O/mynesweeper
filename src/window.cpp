@@ -126,12 +126,14 @@ void Window::setFieldFlag(size_t row, size_t col, bool flag)
   if (flag)
   {
     _GET_TILE_WIDGET(row, col)->flag(this->flagged_sprites.normal, this->flagged_sprites.highlighted);
-    this->setMinesDisplay(++this->current_mines);
+    this->current_mines++;
+    this->setMinesDisplay();
   }
   else
   {
     _GET_TILE_WIDGET(row, col)->reset(this->untouched_sprites.normal, this->untouched_sprites.highlighted);
-    this->setMinesDisplay(--this->current_mines);
+    this->current_mines--;
+    this->setMinesDisplay();
   }
 }
 
@@ -198,7 +200,7 @@ void Window::generateMinefield(size_t rows, size_t cols, size_t nr_bombs)
   this->current_field_size = {rows, cols};
 
   this->current_mines = 0ul;
-  this->setMinesDisplay(this->current_mines);
+  this->setMinesDisplay();
 }
 
 void Window::resetMinefield()
@@ -211,15 +213,15 @@ void Window::resetMinefield()
   }
 
   this->current_mines = 0ul;
-  this->setMinesDisplay(this->current_mines);
+  this->setMinesDisplay();
 }
 
-void Window::setMinesDisplay(size_t nr_revealed_mines)
+void Window::setMinesDisplay()
 {
   MW_SET_FUNC_SCOPE;
 
   std::ostringstream label_text;
-  label_text << std::setw(3) << nr_revealed_mines << '/' << std::setw(3) << this->current_max_mines;
+  label_text << std::setw(3) << this->current_mines << '/' << std::setw(3) << this->current_max_mines;
 
   this->nr_bombs_widget.set_text(label_text.str());
 }
