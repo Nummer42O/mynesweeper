@@ -1,13 +1,5 @@
 #include "no_moves_left_dialog.hpp"
 
-/**
- * TODO:
- *  - actually implement this
- *  - implement logic function behind this:
- *   1. generate list of all unrevealed tiles adjacent to revealed ones
- *   2. iterate over those and check if revealing those would solve the problem
- *   3. if none of those solve the problem, reveal any of them, remove it from list and repeat from 2.
-*/
 
 NoMovesLeftDialog::NoMovesLeftDialog(Gtk::Window &parent):
   Dialog("No Moves Left", parent, Gtk::DIALOG_DESTROY_WITH_PARENT | Gtk::DIALOG_MODAL)
@@ -52,7 +44,7 @@ NoMovesLeftDialog::ReturnType NoMovesLeftDialog::run()
     result = ReturnType::RESTART;
     break;
   default:
-    MW_LOG(error) << "unkown/-expected dialog return value: " << dialog_response << std::endl;
+    MW_LOG(error) << "unkown/-expected dialog return value: " << dialog_response;
 
     result = ReturnType::NO;
     break;

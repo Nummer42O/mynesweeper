@@ -97,7 +97,7 @@ NewGameDialog::ReturnType NewGameDialog::run(Type type, size_t &io_rows, size_t 
     result = ReturnType::UNDO;
     break;
   default:
-    MW_LOG(error) << "unkown/-expected dialog return value: " << dialog_response << std::endl;
+    MW_LOG(error) << "unkown/-expected dialog return value: " << dialog_response;
 
     result = ReturnType::QUIT;
     break;
