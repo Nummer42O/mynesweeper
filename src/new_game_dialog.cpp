@@ -37,7 +37,7 @@ NewGameDialog::NewGameDialog(Gtk::Window &parent):
   this->rows_widget.set_hexpand(true);
   base->attach(this->rows_widget, 1, 0);
 
-  Gtk::Label *cols_label = Gtk::make_managed<Gtk::Label>("Cols: ", Gtk::ALIGN_START);
+  Gtk::Label *cols_label = Gtk::make_managed<Gtk::Label>("Columns: ", Gtk::ALIGN_START);
   base->attach(*cols_label, 0, 1);
   this->cols_widget.set_digits(0);
   this->cols_widget.set_round_digits(0);

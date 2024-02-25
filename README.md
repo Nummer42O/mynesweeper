@@ -21,7 +21,7 @@ Fell absolutely free to post Issues and PRs, but no guarantees.
 - [ ] keyboard callbacks
 - [ ] restart button should initially be called start
 - [ ] start new game dialog automatically
-- [ ] change new game dialog "Col: " to "Column: " and maybe adopt formatting/arrangement
+- [X] change new game dialog "Col: " to "Column: " and maybe adopt formatting/arrangement
 - [ ] check performance of `Minefield::activateField` as member function pointer vs if statement
 - [ ] make tiles hold their own copies of flagged and normal the sprite pointers
 
