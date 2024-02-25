@@ -14,25 +14,42 @@
 class Window : public Gtk::Window
 {
 public:
+  typedef sigc::slot<
+    void
+  > restart_button_callback_t;
+
+public:
+  /**
+   * @brief Create a window displaying the minefield.
+   *
+   * @param tile_clicked_callback the callback to relay to all tiles
+   */
   Window(
     Tile::callback_t tile_clicked_callback
   );
 
+  /**
+   * @brief (Re)bind a callback to the restart button.
+   *
+   * @param callback the new callback
+   */
   void bindRestartButtonCallback(
-    sigc::slot<void> &&callback
+    restart_button_callback_t callback
   );
 
   /**
-   * Load mine and flag sprites into memory.
+   * @brief Load mine and flag sprites into memory.
+   *
+   * @returns false if a sprite could not be loaded, true otherwise
    */
   bool loadSprites();
 
   /**
-   * @brief Reveal a field as a number (1-8), empty (0) or bomb (-1).
+   * @brief Reveal a tile as a number (1-8), empty (0) or bomb (-1).
    *
-   * @param row: row of the target tile
-   * @param col: column of the target tile
-   * @param as: type of field
+   * @param row row / y coordinate
+   * @param col column / x coordinate
+   * @param as type of field
    */
   void revealField(
     size_t row,
@@ -41,10 +58,10 @@ public:
   );
 
   /**
-   * @brief Undo revelation of field.
+   * @brief Undo revelation of tile.
    *
-   * @param row: row / y coordinate
-   * @param col: column / x coordinate
+   * @param row row / y coordinate
+   * @param col column / x coordinate
    */
   void undoFieldReveal(
     size_t row,
@@ -52,10 +69,10 @@ public:
   );
 
   /**
-   * @brief Flag/Unflag a field as possible bomb.
+   * @brief Toggle tile as flagged.
    *
-   * @param row: row of the target tile
-   * @param col: column of the target tile
+   * @param row row / y coordinate
+   * @param col column / x coordinate
    */
   void setFieldFlag(
     size_t row,
@@ -63,29 +80,37 @@ public:
     bool flag
   );
 
+  /**
+   * @brief Generate/Rearrange and reset all the tiles in the minefield.
+   *
+   * @param rows vertical field size
+   * @param cols horizontal field size
+   * @param nr_bombs the maximum number of bombs to be found
+   */
   void generateMinefield(
     size_t rows,
     size_t cols,
     size_t nr_bombs
   );
 
+  /**
+   * @brief Reset the current minefield without changing its size.
+   */
   void resetMinefield();
 
+  /**
+   * @brief Update the mine counter label/display.
+   *
+   * @param nr_revealed_mines number of revealed mines
+   */
   void setMinesDisplay(
     size_t nr_revealed_mines
   );
 
   /**
-   * Calculate how many rows and columns can be put in the current window.
+   * @brief Check the soft maximum rows and columns for the current window size.
    */
   field_size_t getMaxFieldSize();
-
-private:
-
-  size_t getFieldPosition(
-    size_t row,
-    size_t col
-  );
 
 private:
   MW_DECLARE_LOGGER;

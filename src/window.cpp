@@ -51,7 +51,7 @@ Window::Window(Tile::callback_t tile_clicked_callback):
   controls_box->pack_end(this->restart_widget, Gtk::PACK_SHRINK);
 }
 
-void Window::bindRestartButtonCallback(sigc::slot<void> &&callback)
+void Window::bindRestartButtonCallback(restart_button_callback_t callback)
 {
   MW_SET_FUNC_SCOPE;
 
@@ -146,13 +146,6 @@ field_size_t Window::getMaxFieldSize()
       height = scrolled_base->get_height();
 
   return field_size_t{(height - SPACING) / (SPACING + TILE_SIZE), (width - SPACING) / (SPACING + TILE_SIZE)};
-}
-
-size_t Window::getFieldPosition(size_t row, size_t col)
-{
-  MW_SET_FUNC_SCOPE;
-
-  return row * this->current_field_size.cols + col;
 }
 
 void Window::generateMinefield(size_t rows, size_t cols, size_t nr_bombs)
