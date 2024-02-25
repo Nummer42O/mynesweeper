@@ -61,7 +61,7 @@ public:
   /* #region minefield generation */
 
   /**
-   * Create a new minefield of given size and initialize it.
+   * @brief Create the minefield of given size and set it up for on demand initialization.
    *
    * @param rows: new minefield height
    * @param cols: new minefield width
@@ -72,8 +72,7 @@ public:
   );
 
   /**
-   * Resizes the current field to the new size if it differs.
-   * Will always reinitialize all fields.
+   * @brief Resize the field to the new size if it differs and set it up for on demand initialization.
    *
    * @param rows: new minefield height
    * @param cols: new minefield width
@@ -84,7 +83,7 @@ public:
   );
 
   /**
-   * Reininitialize the mine field with the same size as before.
+   * @brief Set the field up for on demand initialization
    */
   void reset();
 
@@ -101,7 +100,7 @@ public:
    */
 
   /**
-   * @brief Attempts to undo revelation of field.
+   * @brief Attempt to undo revelation of field.
    *
    * @param row: row / y coordinate
    * @param col: column / x coordinate
@@ -114,7 +113,7 @@ public:
   );
 
   /**
-   * Flag or unflag the field as suspected mine.
+   * @brief Flag or unflag the field as suspected mine.
    *
    * @param row: row / y coordinate
    * @param col: column / x coordinate
@@ -128,6 +127,11 @@ public:
     bool &o_is_flagged
   );
 
+  /**
+   * @brief Help the user by revealing fields until they have available moves again.
+   *
+   * @param o_revealed_fields vector of tiles that got revealed in cascade
+   */
   void revealFieldsForUser(
     cascade_t &o_revealed_fields
   );
@@ -143,7 +147,7 @@ public:
   bool checkGameWon();
 
   /**
-   * @brief Checks if there are any "reasonable" moves left.
+   * @brief Check if there are any "reasonable" moves left.
    *
    * @returns true if the check succeded, false otherwise
    */
@@ -153,7 +157,7 @@ public:
   /* #region getters */
 
   /**
-   * Get the number of mines for the current field.
+   * @brief Get the number of mines for the current field.
    *
    * @returns nr of mines
    */
@@ -165,7 +169,7 @@ private:
   /* #region minefield generation */
 
   /**
-   * Assign random states to the fields.
+   * @brief Assign random states to the fields.
    */
   void initFields();
 
@@ -173,7 +177,7 @@ private:
   /* #region field manipulation */
 
   /**
-   * Reveals the first field and will set of a reveal cascade.
+   * @brief Reveal the first field and will set of a reveal cascade.
    *
    * @param row: row / y coordinate
    * @param col: column / x coordinate
@@ -190,7 +194,7 @@ private:
   );
 
   /**
-   * Attempts to reveal the field and may set of a reveal cascade.
+   * @brief Attempt to reveal the field and may set of a reveal cascade.
    *
    * @param row: row / y coordinate
    * @param col: column / x coordinate
@@ -210,7 +214,7 @@ private:
   /* #region status checks */
 
   /**
-   * @brief Checks wether all mines sourrnding the tile are flagged.
+   * @brief Check wether all mines sourrnding the tile are flagged.
    *
    * @note It is not checked, wether this check itself makes sense or not.
    *
@@ -228,14 +232,14 @@ private:
   /* #region getters */
 
   /**
-   * Function to calculate number of mines from field count.
+   * @brief Calculate number of mines from field count.
    *
    * @returns number of mines
    */
   size_t calculateNrOfMines();
 
   /**
-   * @brief Convert tile position to field index.
+   * @brief Get the field index from a tile position.
    *
    * @note No range checks are performed.
    *
@@ -250,7 +254,7 @@ private:
   );
 
   /**
-   * Checks if the indices are in bounds and returns Tile if so.
+   * @brief Attempt to get the tile at the specified position.
    *
    * @param row row / y coordinate
    * @param col column / x coordinate
