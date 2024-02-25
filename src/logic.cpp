@@ -40,7 +40,7 @@ Minefield::Minefield(size_t rows, size_t cols) : current_field_size{rows, cols}
 
   this->nr_of_mines = this->calculateNrOfMines();
 
-  this->activateField = sigc::mem_fun4(*this, &Minefield::activateFieldInitial);
+  this->activate_field_callback = &Minefield::activateFieldInitial;
   this->field_inizialized = false;
 }
 
@@ -57,7 +57,7 @@ void Minefield::resize(size_t rows, size_t cols)
 
   this->nr_of_mines = this->calculateNrOfMines();
 
-  this->activateField = sigc::mem_fun4(*this, &Minefield::activateFieldInitial);
+  this->activate_field_callback = &Minefield::activateFieldInitial;
   this->field_inizialized = false;
 }
 
@@ -67,7 +67,7 @@ void Minefield::reset()
 
   MW_LOG(trace) << "reset";
 
-  this->activateField = sigc::mem_fun4(*this, &Minefield::activateFieldInitial);
+  this->activate_field_callback = &Minefield::activateFieldInitial;
   this->field_inizialized = false;
 }
 
@@ -122,6 +122,11 @@ void Minefield::initFields()
 
 /* #endregion */
 /* #region field manipulation */
+
+bool Minefield::activateField(size_t row, size_t col, cascade_t &o_revealed_fields, bool & o_has_revealed_mine)
+{
+  return (this->*(this->activate_field_callback))(row, col, o_revealed_fields, o_has_revealed_mine);
+}
 
 bool Minefield::undoFieldActivation(size_t row, size_t col)
 {
@@ -277,7 +282,7 @@ bool Minefield::activateFieldInitial(size_t row, size_t col, std::vector<tile_wi
   } while (o_has_revealed_mine || (o_revealed_fields.size() < MIN_INITIAL_FIELDS));
 
   // from this point forth use the "normal" activation function
-  this->activateField = sigc::mem_fun4(*this, &Minefield::activateFieldMain);
+  this->activate_field_callback = &Minefield::activateFieldMain;
   this->field_inizialized = true;
 
 #ifdef MW_DEBUG

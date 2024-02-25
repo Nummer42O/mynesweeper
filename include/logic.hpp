@@ -50,12 +50,12 @@ private:
     int64_t rows, cols;
   } tile_offset_t;
 
-  typedef sigc::slot<
-    bool,
-    size_t /*row*/, size_t /*col*/,
-    std::vector<tile_with_position_t> & /*o_revealed_fields*/,
+  typedef bool (Minefield::*activate_field_callback_t)(
+    size_t /*row*/,
+    size_t /*col*/,
+    cascade_t & /*o_revealed_fields*/,
     bool & /*o_has_revealed_mine*/
-  > activate_field_callback_t;
+  );
 
 public:
   /* #region minefield generation */
@@ -91,13 +91,21 @@ public:
   /* #region field manipulation */
 
   /**
-   * bool activateField(
-   *   size_t row,
-   *   size_t col,
-   *   cascade_t &o_revealed_fields,
-   *   bool &o_has_revealed_mine
-   * );
+   * @brief Attempt to reveal the field and maybe set of a reveal cascade.
+   *
+   * @param row row / y coordinate
+   * @param col column / x coordinate
+   * @param o_revealed_fields vector of tiles that got revealed in cascade
+   * @param o_has_revealed_mine wether @ref `o_revealed_fields` contains a mine or not
+   *
+   * @returns true if the position was valid, false otherwise
    */
+  bool activateField(
+    size_t row,
+    size_t col,
+    cascade_t &o_revealed_fields,
+    bool &o_has_revealed_mine
+  );
 
   /**
    * @brief Attempt to undo revelation of field.
@@ -270,11 +278,10 @@ private:
 
   /* #endregion */
 
-public:
-  activate_field_callback_t activateField;
-
 private:
   MW_DECLARE_LOGGER;
+
+  activate_field_callback_t activate_field_callback;
 
   field_size_t current_field_size;
   size_t nr_of_mines;
