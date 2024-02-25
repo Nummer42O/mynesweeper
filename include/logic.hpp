@@ -63,8 +63,8 @@ public:
   /**
    * @brief Create the minefield of given size and set it up for on demand initialization.
    *
-   * @param rows: new minefield height
-   * @param cols: new minefield width
+   * @param rows new minefield height
+   * @param cols new minefield width
    */
   Minefield(
     size_t rows,
@@ -74,8 +74,8 @@ public:
   /**
    * @brief Resize the field to the new size if it differs and set it up for on demand initialization.
    *
-   * @param rows: new minefield height
-   * @param cols: new minefield width
+   * @param rows new minefield height
+   * @param cols new minefield width
    */
   void resize(
     size_t rows,
@@ -102,8 +102,8 @@ public:
   /**
    * @brief Attempt to undo revelation of field.
    *
-   * @param row: row / y coordinate
-   * @param col: column / x coordinate
+   * @param row row / y coordinate
+   * @param col column / x coordinate
    *
    * @returns true if the position was valid, false otherwise
    */
@@ -115,9 +115,9 @@ public:
   /**
    * @brief Flag or unflag the field as suspected mine.
    *
-   * @param row: row / y coordinate
-   * @param col: column / x coordinate
-   * @param o_is_flagged: wether to activate or deactivate flag
+   * @param row row / y coordinate
+   * @param col column / x coordinate
+   * @param o_is_flagged wether to activate or deactivate flag
    *
    * @returns true if o_is_flagged is valid, false otherwise
    */
@@ -179,10 +179,10 @@ private:
   /**
    * @brief Reveal the first field and will set of a reveal cascade.
    *
-   * @param row: row / y coordinate
-   * @param col: column / x coordinate
-   * @param o_revealed_fields: vector of tiles that got revealed in cascade
-   * @param o_has_revealed_mine: wether @ref `o_revealed_fields` contains a mine or not
+   * @param row row / y coordinate
+   * @param col column / x coordinate
+   * @param o_revealed_fields vector of tiles that got revealed in cascade
+   * @param o_has_revealed_mine wether @ref `o_revealed_fields` contains a mine or not
    *
    * @returns true if the position was valid, false otherwise
    */
@@ -196,10 +196,10 @@ private:
   /**
    * @brief Attempt to reveal the field and may set of a reveal cascade.
    *
-   * @param row: row / y coordinate
-   * @param col: column / x coordinate
-   * @param o_revealed_fields: vector of tiles that got revealed in cascade
-   * @param o_has_revealed_mine: wether @ref `o_revealed_fields` contains a mine or not
+   * @param row row / y coordinate
+   * @param col column / x coordinate
+   * @param o_revealed_fields vector of tiles that got revealed in cascade
+   * @param o_has_revealed_mine wether @ref `o_revealed_fields` contains a mine or not
    *
    * @returns true if the position was valid, false otherwise
    */
@@ -258,7 +258,7 @@ private:
    *
    * @param row row / y coordinate
    * @param col column / x coordinate
-   * @param o_is_valid: true if the position is valid, false otherwise
+   * @param o_is_valid true if the position is valid, false otherwise
    *
    * @returns the selected tile
    */
