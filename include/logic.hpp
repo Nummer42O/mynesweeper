@@ -50,13 +50,6 @@ private:
     int64_t rows, cols;
   } tile_offset_t;
 
-  typedef bool (Minefield::*activate_field_callback_t)(
-    size_t /*row*/,
-    size_t /*col*/,
-    cascade_t & /*o_revealed_fields*/,
-    bool & /*o_has_revealed_mine*/
-  );
-
 public:
   /* #region minefield generation */
 
@@ -280,8 +273,6 @@ private:
 
 private:
   MW_DECLARE_LOGGER;
-
-  activate_field_callback_t activate_field_callback;
 
   field_size_t current_field_size;
   size_t nr_of_mines;
