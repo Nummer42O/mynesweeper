@@ -137,19 +137,6 @@ void Window::setFieldFlag(size_t row, size_t col, bool flag)
   }
 }
 
-field_size_t Window::getMaxFieldSize()
-{
-  MW_SET_FUNC_SCOPE;
-
-  Gtk::Box *base = static_cast<Gtk::Box *>(this->get_child());
-  Gtk::ScrolledWindow *scrolled_base = static_cast<Gtk::ScrolledWindow *>(base->get_children().at(0));
-
-  int width  = scrolled_base->get_width(),
-      height = scrolled_base->get_height();
-
-  return field_size_t{(height - SPACING) / (SPACING + TILE_SIZE), (width - SPACING) / (SPACING + TILE_SIZE)};
-}
-
 void Window::generateMinefield(size_t rows, size_t cols, size_t nr_bombs)
 {
   MW_SET_FUNC_SCOPE;
@@ -214,6 +201,19 @@ void Window::resetMinefield()
 
   this->current_mines = 0ul;
   this->setMinesDisplay();
+}
+
+field_size_t Window::getMaxFieldSize()
+{
+  MW_SET_FUNC_SCOPE;
+
+  Gtk::Box *base = static_cast<Gtk::Box *>(this->get_child());
+  Gtk::ScrolledWindow *scrolled_base = static_cast<Gtk::ScrolledWindow *>(base->get_children().at(0));
+
+  int width  = scrolled_base->get_width(),
+      height = scrolled_base->get_height();
+
+  return field_size_t{(height - SPACING) / (SPACING + TILE_SIZE), (width - SPACING) / (SPACING + TILE_SIZE)};
 }
 
 void Window::setMinesDisplay()
