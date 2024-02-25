@@ -19,7 +19,7 @@ Fell absolutely free to post Issues and PRs, but no guarantees.
   <!-- ref: https://developer-old.gnome.org/glibmm/stable/classGio_1_1Settings.html -->
 - [ ] make .deb package
 - [ ] keyboard callbacks
-- [ ] restart button should initially be called start
+- ~~[ ] restart button should initially be called start~~
 - [ ] start new game dialog automatically
 - [X] change new game dialog "Col: " to "Column: " and maybe adopt formatting/arrangement
 - [X] check performance of `Minefield::activateField` as member function pointer vs if statement
