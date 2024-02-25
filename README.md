@@ -24,7 +24,7 @@ Fell absolutely free to post Issues and PRs, but no guarantees.
 - [X] change new game dialog "Col: " to "Column: " and maybe adopt formatting/arrangement
 - [X] check performance of `Minefield::activateField` as member function pointer vs if statement
 - [X] make tiles hold their own copies of flagged and normal the sprite pointers
-- [ ] show flag icon with mine counter
+- [X] show flag icon with mine counter
 
 ## Requirements
 

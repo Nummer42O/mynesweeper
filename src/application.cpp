@@ -5,7 +5,6 @@
 #include <thread>
 #include <chrono>
 #include <iomanip>
-#include <sysexits.h>
 
 
 Application::Application():
@@ -28,11 +27,6 @@ void Application::on_activate()
   this->window->bindRestartButtonCallback(
     sigc::mem_fun0(*this, &Application::startGame)
   );
-
-  if (!this->window->loadSprites())
-  {
-    std::exit(EX_NOINPUT);
-  }
 
   this->new_game_dialog = std::make_shared<NewGameDialog>(*(this->window));
   this->no_moves_left_dialog = std::make_shared<NoMovesLeftDialog>(*(this->window));

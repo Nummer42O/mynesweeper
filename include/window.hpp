@@ -38,13 +38,6 @@ public:
   );
 
   /**
-   * @brief Load mine and flag sprites into memory.
-   *
-   * @returns false if a sprite could not be loaded, true otherwise
-   */
-  bool loadSprites();
-
-  /**
    * @brief Reveal a tile as a number (1-8), empty (0) or bomb (-1).
    *
    * @param row row / y coordinate
@@ -108,6 +101,13 @@ private:
    * @brief Update the mine counter label/display.
    */
   void setMinesDisplay();
+
+  /**
+   * @brief Load mine and flag sprites into memory.
+   *
+   * @returns false if a sprite could not be loaded, true otherwise
+   */
+  bool loadSprites();
 
   /**
    * @brief Get the @ref Tile from the field grid widgets children.

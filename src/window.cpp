@@ -5,6 +5,7 @@
 #include <sstream>
 #include <iomanip>
 #include <exception>
+#include <sysexits.h>
 
 
 Window::Window(Tile::callback_t tile_clicked_callback):
@@ -12,6 +13,13 @@ Window::Window(Tile::callback_t tile_clicked_callback):
 {
   MW_SET_CLASS_ORIGIN;
   MW_SET_FUNC_SCOPE;
+
+  if (!this->loadSprites())
+  {
+    MW_LOG(fatal) << "Failed to load some sprites.";
+
+    std::exit(EX_NOINPUT);
+  }
 
   this->set_title(PROGRAM_NAME);
   this->set_icon_name(EXECUTABLE_NAME ".png");
@@ -43,6 +51,8 @@ Window::Window(Tile::callback_t tile_clicked_callback):
   base->pack_end(*controls_box, Gtk::PACK_SHRINK);
 
   // add controls
+  Gtk::Image *flag_logo = Gtk::make_managed<Gtk::Image>(this->flagged_sprites.normal);
+  controls_box->pack_start(*flag_logo, Gtk::PACK_SHRINK, SPACING);
   this->nr_bombs_widget = Gtk::Label("/", Gtk::ALIGN_CENTER);
   controls_box->pack_start(this->nr_bombs_widget, Gtk::PACK_SHRINK);
   this->restart_widget = Gtk::Button("Start new game");
@@ -60,41 +70,6 @@ void Window::bindRestartButtonCallback(restart_button_callback_t callback)
     restart_button_callback_connection.disconnect();
   }
   restart_button_callback_connection = std::move(this->restart_widget.signal_clicked().connect(callback, true));
-}
-
-bool Window::loadSprites()
-{
-  MW_SET_FUNC_SCOPE;
-
-  try
-  {
-    this->reveal_sprites.at(0ul) = Gdk::Pixbuf::create_from_file(SPRITE_DIRECTORY "/mine.bmp");
-    this->reveal_sprites.at(1ul) = Gdk::Pixbuf::create_from_file(SPRITE_DIRECTORY "/revealed.bmp");
-    for (size_t idx = 1ul; idx < 9; idx++)
-    {
-      this->reveal_sprites.at(idx + 1ul) = Gdk::Pixbuf::create_from_file(SPRITE_DIRECTORY "/" + std::to_string(idx) + ".bmp");
-    }
-
-    untouched_sprites.normal = Gdk::Pixbuf::create_from_file(SPRITE_DIRECTORY "/untouched_normal.bmp");
-    untouched_sprites.highlighted = Gdk::Pixbuf::create_from_file(SPRITE_DIRECTORY "/untouched_highlighted.bmp");
-
-    flagged_sprites.normal = Gdk::Pixbuf::create_from_file(SPRITE_DIRECTORY "/flag_normal.bmp");
-    flagged_sprites.highlighted = Gdk::Pixbuf::create_from_file(SPRITE_DIRECTORY "/flag_highlighted.bmp");
-  }
-  catch (const Glib::FileError &error)
-  {
-    MW_LOG(error) << "FileError: " << error.what();
-
-    return false;
-  }
-  catch (const Gdk::PixbufError &error)
-  {
-    MW_LOG(error) << "PixbufError: " << error.what();
-
-    return false;
-  }
-
-  return true;
 }
 
 void Window::revealField(size_t row, size_t col, int as)
@@ -224,6 +199,41 @@ void Window::setMinesDisplay()
   label_text << std::setw(3) << this->current_mines << '/' << std::setw(3) << this->current_max_mines;
 
   this->nr_bombs_widget.set_text(label_text.str());
+}
+
+bool Window::loadSprites()
+{
+  MW_SET_FUNC_SCOPE;
+
+  try
+  {
+    this->reveal_sprites.at(0ul) = Gdk::Pixbuf::create_from_file(SPRITE_DIRECTORY "/mine.bmp");
+    this->reveal_sprites.at(1ul) = Gdk::Pixbuf::create_from_file(SPRITE_DIRECTORY "/revealed.bmp");
+    for (size_t idx = 1ul; idx < 9; idx++)
+    {
+      this->reveal_sprites.at(idx + 1ul) = Gdk::Pixbuf::create_from_file(SPRITE_DIRECTORY "/" + std::to_string(idx) + ".bmp");
+    }
+
+    untouched_sprites.normal = Gdk::Pixbuf::create_from_file(SPRITE_DIRECTORY "/untouched_normal.bmp");
+    untouched_sprites.highlighted = Gdk::Pixbuf::create_from_file(SPRITE_DIRECTORY "/untouched_highlighted.bmp");
+
+    flagged_sprites.normal = Gdk::Pixbuf::create_from_file(SPRITE_DIRECTORY "/flag_normal.bmp");
+    flagged_sprites.highlighted = Gdk::Pixbuf::create_from_file(SPRITE_DIRECTORY "/flag_highlighted.bmp");
+  }
+  catch (const Glib::FileError &error)
+  {
+    MW_LOG(error) << "FileError: " << error.what();
+
+    return false;
+  }
+  catch (const Gdk::PixbufError &error)
+  {
+    MW_LOG(error) << "PixbufError: " << error.what();
+
+    return false;
+  }
+
+  return true;
 }
 
 inline Tile *Window::getTile(size_t row, size_t col)
