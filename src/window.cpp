@@ -6,8 +6,6 @@
 #include <iomanip>
 #include <exception>
 
-#define _GET_TILE_WIDGET(row, col) static_cast<Tile *>(this->field_widget.get_child_at(col, row))
-
 
 Window::Window(Tile::callback_t tile_clicked_callback):
   shared_tile_clicked_callback(tile_clicked_callback)
@@ -105,7 +103,7 @@ void Window::revealField(size_t row, size_t col, int as)
 
   MW_LOG(trace) << "revealing field at row=" << row << " col=" << col;
 
-  _GET_TILE_WIDGET(row, col)->revealAs(this->reveal_sprites.at(as + 1));
+  this->getTile(row, col)->revealAs(this->reveal_sprites.at(as + 1));
 }
 
 void Window::undoFieldReveal(size_t row, size_t col)
@@ -114,7 +112,7 @@ void Window::undoFieldReveal(size_t row, size_t col)
 
   MW_LOG(trace) << "undoing field reveal at row=" << row << " col=" << col;
 
-  _GET_TILE_WIDGET(row, col)->reset(this->untouched_sprites.normal, this->untouched_sprites.highlighted);
+  this->getTile(row, col)->reset(this->untouched_sprites.normal, this->untouched_sprites.highlighted);
 }
 
 void Window::setFieldFlag(size_t row, size_t col, bool flag)
@@ -125,13 +123,15 @@ void Window::setFieldFlag(size_t row, size_t col, bool flag)
 
   if (flag)
   {
-    _GET_TILE_WIDGET(row, col)->flag(this->flagged_sprites.normal, this->flagged_sprites.highlighted);
+    this->getTile(row, col)->flag(this->flagged_sprites.normal, this->flagged_sprites.highlighted);
+
     this->current_mines++;
     this->setMinesDisplay();
   }
   else
   {
-    _GET_TILE_WIDGET(row, col)->reset(this->untouched_sprites.normal, this->untouched_sprites.highlighted);
+    this->getTile(row, col)->reset(this->untouched_sprites.normal, this->untouched_sprites.highlighted);
+
     this->current_mines--;
     this->setMinesDisplay();
   }
@@ -224,4 +224,9 @@ void Window::setMinesDisplay()
   label_text << std::setw(3) << this->current_mines << '/' << std::setw(3) << this->current_max_mines;
 
   this->nr_bombs_widget.set_text(label_text.str());
+}
+
+inline Tile *Window::getTile(size_t row, size_t col)
+{
+  return static_cast<Tile *>(this->field_widget.get_child_at(col, row));
 }

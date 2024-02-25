@@ -109,6 +109,18 @@ private:
    */
   void setMinesDisplay();
 
+  /**
+   * @brief Get the @ref Tile from the field grid widgets children.
+   *
+   * @note Does not check if the pointer is valid.
+   *
+   * @param row row / y coordinate
+   * @param col column / x coordinate
+   *
+   * @return a pointer to the tile
+   */
+  inline Tile *getTile(size_t row, size_t col);
+
 private:
   MW_DECLARE_LOGGER;
 
