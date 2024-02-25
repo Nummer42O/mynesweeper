@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstddef>
+#include <glibmm/refptr.h>
+#include <gdkmm/pixbuf.h>
 
 /* #region graphical configs */
 
@@ -53,5 +55,10 @@ typedef struct
     rows = 0ul,
     cols = 0ul;
 } field_size_t;
+
+typedef Glib::RefPtr<Gdk::Pixbuf> sprite_t;
+typedef struct {
+  sprite_t normal, highlighted;
+} state_sprites_t;
 
 /* #endregion */

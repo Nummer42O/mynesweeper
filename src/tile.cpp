@@ -6,9 +6,10 @@
 #endif // defined(MW_DEBUG)
 
 
-Tile::Tile(callback_t click_callback):
+Tile::Tile(callback_t click_callback, const state_sprites_t &flagged, const state_sprites_t &untouched):
   EventBox(),
-  click_callback(click_callback)
+  click_callback(click_callback),
+  flagged_sprites(flagged), untouched_sprites(untouched)
 {
   MW_SET_CLASS_ORIGIN;
   MW_SET_FUNC_SCOPE;
@@ -34,29 +35,26 @@ void Tile::revealAs(const sprite_t &sprite)
 
   this->image.set(sprite);
 
-  this->revealed = true;
+  this->state = TileState::REVEALED;
 }
 
-void Tile::flag(const sprite_t &normal, const sprite_t &highlighted)
+void Tile::flag()
 {
   MW_SET_FUNC_SCOPE;
 
-  this->normal_sprite       = normal;
-  this->highlighted_sprite  = highlighted;
+  //! @note is highlighted because we expect the mouse pointer to be over the tile anyways
+  this->image.set(this->flagged_sprites.highlighted);
 
-  this->image.set(this->highlighted_sprite);
+  this->state = TileState::FLAGGED;
 }
 
-void Tile::reset(const sprite_t &normal, const sprite_t &highlighted)
+void Tile::reset()
 {
   MW_SET_FUNC_SCOPE;
 
-  this->normal_sprite       = normal;
-  this->highlighted_sprite  = highlighted;
+  this->image.set(this->untouched_sprites.normal);
 
-  this->image.set(this->normal_sprite);
-
-  this->revealed = false;
+  this->state = TileState::UNTOUCHED;
 }
 
 void Tile::setPosition(size_t row, size_t col)
@@ -78,9 +76,13 @@ bool Tile::enterNotifyCallback(GdkEventCrossing *)
 {
   MW_SET_FUNC_SCOPE;
 
-  if (!this->revealed)
+  if (this->state == TileState::FLAGGED)
   {
-    this->image.set(this->highlighted_sprite);
+    this->image.set(this->flagged_sprites.highlighted);
+  }
+  else if (this->state == TileState::UNTOUCHED)
+  {
+    this->image.set(this->untouched_sprites.highlighted);
   }
 
   return false;
@@ -90,9 +92,13 @@ bool Tile::leaveNotifyCallback(GdkEventCrossing *)
 {
   MW_SET_FUNC_SCOPE;
 
-  if (!this->revealed)
+  if (this->state == TileState::FLAGGED)
   {
-    this->image.set(this->normal_sprite);
+    this->image.set(this->flagged_sprites.normal);
+  }
+  else if (this->state == TileState::UNTOUCHED)
+  {
+    this->image.set(this->untouched_sprites.normal);
   }
 
   return false;

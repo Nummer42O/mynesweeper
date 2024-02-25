@@ -17,7 +17,11 @@ public:
   > callback_t;
 
 private:
-  typedef Glib::RefPtr<Gdk::Pixbuf> sprite_t;
+  enum class TileState {
+    REVEALED, FLAGGED, UNTOUCHED,
+
+    NO_OPT
+  };
 
 public:
   /**
@@ -26,9 +30,13 @@ public:
    * @note Does still need a sprite.
    *
    * @param click_callback callback for when the tile gets clicked
+   * @param flagged the normal and highlighted tile sprite for the flagged state
+   * @param untouched the normal and highlighted tile sprite for the untouched state
    */
   Tile(
-    callback_t click_callback
+    callback_t click_callback,
+    const state_sprites_t &flagged,
+    const state_sprites_t &untouched
   );
 
   /**
@@ -42,25 +50,13 @@ public:
 
   /**
    * @brief Mark this tile as flagged.
-   *
-   * @param normal the normal flagged tile sprite
-   * @param highlighted the flagged tile sprite if the mouse hovers
    */
-  void flag(
-    const sprite_t &normal,
-    const sprite_t &highlighted
-  );
+  void flag();
 
   /**
    * @brief Unmark/Reset this tile.
-   *
-   * @param normal the normal untouched tile sprite
-   * @param highlighted the untouched tile sprite if the mouse hovers
    */
-  void reset(
-    const sprite_t &normal,
-    const sprite_t &highlighted
-  );
+  void reset();
 
   /**
    * @brief Set the position associated with this tile.
@@ -103,11 +99,11 @@ private:
 private:
   MW_DECLARE_LOGGER;
 
-  size_t row, col;
+  Gtk::Image image;
   callback_t click_callback;
 
-  bool revealed = false;
-  Glib::RefPtr<Gdk::Pixbuf> normal_sprite, highlighted_sprite;
+  size_t row, col;
+  TileState state = TileState::UNTOUCHED;
 
-  Gtk::Image image;
+  state_sprites_t flagged_sprites, untouched_sprites;
 };

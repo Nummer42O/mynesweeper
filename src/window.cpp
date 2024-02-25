@@ -112,7 +112,7 @@ void Window::undoFieldReveal(size_t row, size_t col)
 
   MW_LOG(trace) << "undoing field reveal at row=" << row << " col=" << col;
 
-  this->getTile(row, col)->reset(this->untouched_sprites.normal, this->untouched_sprites.highlighted);
+  this->getTile(row, col)->reset();
 }
 
 void Window::setFieldFlag(size_t row, size_t col, bool flag)
@@ -123,14 +123,14 @@ void Window::setFieldFlag(size_t row, size_t col, bool flag)
 
   if (flag)
   {
-    this->getTile(row, col)->flag(this->flagged_sprites.normal, this->flagged_sprites.highlighted);
+    this->getTile(row, col)->flag();
 
     this->current_mines++;
     this->setMinesDisplay();
   }
   else
   {
-    this->getTile(row, col)->reset(this->untouched_sprites.normal, this->untouched_sprites.highlighted);
+    this->getTile(row, col)->reset();
 
     this->current_mines--;
     this->setMinesDisplay();
@@ -148,7 +148,7 @@ void Window::generateMinefield(size_t rows, size_t cols, size_t nr_bombs)
   {
     for (size_t idx = old_tile_count; idx < new_tile_count; idx++)
     {
-      Tile *new_tile = Gtk::make_managed<Tile>(this->shared_tile_clicked_callback);
+      Tile *new_tile = Gtk::make_managed<Tile>(this->shared_tile_clicked_callback, this->flagged_sprites, this->untouched_sprites);
       this->field_widget.add(*new_tile);
     }
   }
@@ -171,7 +171,7 @@ void Window::generateMinefield(size_t rows, size_t cols, size_t nr_bombs)
 
     Tile *tile = static_cast<Tile *>(children.at(idx));
     tile->setPosition(row, col);
-    tile->reset(this->untouched_sprites.normal, this->untouched_sprites.highlighted);
+    tile->reset();
 
     // a little bit of referencing magic so tiles can be reordered without being garbage collected
     tile->reference();
@@ -196,7 +196,7 @@ void Window::resetMinefield()
 
   for (Gtk::Widget *widget: this->field_widget.get_children())
   {
-    static_cast<Tile *>(widget)->reset(this->untouched_sprites.normal, this->untouched_sprites.highlighted);
+    static_cast<Tile *>(widget)->reset();
   }
 
   this->current_mines = 0ul;

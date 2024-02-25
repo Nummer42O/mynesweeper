@@ -130,11 +130,7 @@ private:
 
   // 0: bomb, 1: empty, x (2-9): field nr x-2
   std::array<Glib::RefPtr<Gdk::Pixbuf>, 10ul> reveal_sprites;
-  struct
-  {
-    Glib::RefPtr<Gdk::Pixbuf> normal;
-    Glib::RefPtr<Gdk::Pixbuf> highlighted;
-  } untouched_sprites, flagged_sprites;
+  state_sprites_t untouched_sprites, flagged_sprites;
 
   Gtk::Grid field_widget;
   Gtk::Label nr_bombs_widget;
