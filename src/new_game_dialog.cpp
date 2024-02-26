@@ -52,7 +52,7 @@ NewGameDialog::NewGameDialog(Gtk::Window &parent):
   this->add_button(Gtk::Stock::CLOSE, Gtk::RESPONSE_CLOSE);
 }
 
-NewGameDialog::ReturnType NewGameDialog::run(Type type, size_t &io_rows, size_t max_rows, size_t &io_cols, size_t max_cols)
+NewGameDialog::ReturnType NewGameDialog::run(Type type, index_t &io_rows, index_t max_rows, index_t &io_cols, index_t max_cols)
 {
   MW_SET_FUNC_SCOPE;
 
@@ -75,8 +75,8 @@ NewGameDialog::ReturnType NewGameDialog::run(Type type, size_t &io_rows, size_t 
 
   int dialog_response = Gtk::Dialog::run();
 
-  io_rows = static_cast<size_t>(this->rows_widget.get_value());
-  io_cols = static_cast<size_t>(this->cols_widget.get_value());
+  io_rows = static_cast<index_t>(this->rows_widget.get_value());
+  io_cols = static_cast<index_t>(this->cols_widget.get_value());
 
   ReturnType result;
   switch (dialog_response)

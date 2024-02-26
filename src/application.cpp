@@ -40,11 +40,11 @@ void Application::on_activate()
 /* #endregion */
 /* #region Dialog Handlers */
 
-NewGameDialog::ReturnType Application::showNewGame(NewGameDialog::Type type, size_t &o_rows, size_t &o_cols)
+NewGameDialog::ReturnType Application::showNewGame(NewGameDialog::Type type, index_t &o_rows, index_t &o_cols)
 {
   MW_SET_FUNC_SCOPE;
 
-  field_size_t theoretical_max = this->window->getMaxFieldSize();
+  field_index_t theoretical_max = this->window->getMaxFieldSize();
   NewGameDialog::ReturnType dialog_response = this->new_game_dialog->run(type,
     o_rows, theoretical_max.rows,
     o_cols, theoretical_max.cols
@@ -65,7 +65,7 @@ NoMovesLeftDialog::ReturnType Application::showNoMovesLeft()
 /* #endregion */
 /* #region Mouse Callbacks */
 
-void Application::clickedCallback(bool is_reveal, size_t row, size_t col)
+void Application::clickedCallback(bool is_reveal, index_t row, index_t col)
 {
   MW_SET_FUNC_SCOPE;
 
@@ -79,7 +79,7 @@ void Application::clickedCallback(bool is_reveal, size_t row, size_t col)
   }
 }
 
-void Application::revealCallback(size_t row, size_t col)
+void Application::revealCallback(index_t row, index_t col)
 {
   MW_SET_FUNC_SCOPE;
 
@@ -115,7 +115,7 @@ void Application::revealCallback(size_t row, size_t col)
   }
 }
 
-void Application::flagCallback(size_t row, size_t col)
+void Application::flagCallback(index_t row, index_t col)
 {
   MW_SET_FUNC_SCOPE;
 
@@ -156,7 +156,7 @@ bool Application::newGame(NewGameDialog::Type type)
 {
   MW_SET_FUNC_SCOPE;
 
-  size_t  rows = this->current_field_size.rows,
+  index_t  rows = this->current_field_size.rows,
           cols = this->current_field_size.cols;
   NewGameDialog::ReturnType new_game_return_type = this->showNewGame(type, rows, cols);
   if (new_game_return_type == NewGameDialog::ReturnType::UNDO)

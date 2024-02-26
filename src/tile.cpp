@@ -57,7 +57,7 @@ void Tile::reset()
   this->state = TileState::UNTOUCHED;
 }
 
-void Tile::setPosition(size_t row, size_t col)
+void Tile::setPosition(index_t row, index_t col)
 {
   MW_SET_FUNC_SCOPE;
 

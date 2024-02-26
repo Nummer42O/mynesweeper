@@ -45,10 +45,10 @@ public:
    */
   ReturnType run(
     Type type,
-    size_t &io_rows,
-    size_t max_rows,
-    size_t &io_cols,
-    size_t max_cols
+    index_t &io_rows,
+    index_t max_rows,
+    index_t &io_cols,
+    index_t max_cols
   );
 
 private:

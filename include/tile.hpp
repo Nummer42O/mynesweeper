@@ -12,8 +12,8 @@ public:
   typedef sigc::slot<
     void,
     bool /*is_reveal*/,
-    size_t /*row*/,
-    size_t /*col*/
+    index_t /*row*/,
+    index_t /*col*/
   > callback_t;
 
 private:
@@ -64,7 +64,7 @@ public:
    * @param row row / y coordinate
    * @param col column / x coordinate
    */
-  void setPosition(size_t row, size_t col);
+  void setPosition(index_t row, index_t col);
 
 private:
   /**
@@ -102,7 +102,7 @@ private:
   Gtk::Image image;
   callback_t click_callback;
 
-  size_t row, col;
+  index_t row, col;
   TileState state = TileState::UNTOUCHED;
 
   state_sprites_t flagged_sprites, untouched_sprites;

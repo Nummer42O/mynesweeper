@@ -15,7 +15,7 @@ class Minefield
 public:
   typedef struct
   {
-    size_t row, col;
+    index_t row, col;
 
     // number (1-8), empty (0) or mine (-1)
     int type;
@@ -42,7 +42,7 @@ private:
 
   typedef struct
   {
-    size_t row, col;
+    index_t row, col;
   } tile_position_t;
 
   typedef struct
@@ -60,8 +60,8 @@ public:
    * @param cols new minefield width
    */
   Minefield(
-    size_t rows,
-    size_t cols
+    index_t rows,
+    index_t cols
   );
 
   /**
@@ -71,8 +71,8 @@ public:
    * @param cols new minefield width
    */
   void resize(
-    size_t rows,
-    size_t cols
+    index_t rows,
+    index_t cols
   );
 
   /**
@@ -94,8 +94,8 @@ public:
    * @returns true if the position was valid, false otherwise
    */
   bool activateField(
-    size_t row,
-    size_t col,
+    index_t row,
+    index_t col,
     cascade_t &o_revealed_fields,
     bool &o_has_revealed_mine
   );
@@ -109,8 +109,8 @@ public:
    * @returns true if the position was valid, false otherwise
    */
   bool undoFieldActivation(
-    size_t row,
-    size_t col
+    index_t row,
+    index_t col
   );
 
   /**
@@ -123,8 +123,8 @@ public:
    * @returns true if o_is_flagged is valid, false otherwise
    */
   bool toggleFieldFlag(
-    size_t row,
-    size_t col,
+    index_t row,
+    index_t col,
     bool &o_is_flagged
   );
 
@@ -162,7 +162,7 @@ public:
    *
    * @returns nr of mines
    */
-  const size_t &getNrMines();
+  const index_t &getNrMines();
 
   /* #endregion */
 
@@ -188,8 +188,8 @@ private:
    * @returns true if the position was valid, false otherwise
    */
   bool activateFieldInitial(
-    size_t row,
-    size_t col,
+    index_t row,
+    index_t col,
     std::vector<tile_with_position_t> &o_revealed_fields,
     bool &o_has_revealed_mine
   );
@@ -205,8 +205,8 @@ private:
    * @returns true if the position was valid, false otherwise
    */
   bool activateFieldMain(
-    size_t row,
-    size_t col,
+    index_t row,
+    index_t col,
     std::vector<tile_with_position_t> &o_revealed_fields,
     bool &o_has_revealed_mine
   );
@@ -225,8 +225,8 @@ private:
    * @returns true if the check succeded, false otherwise
    */
   bool checkMineCountSatisfied(
-    size_t row,
-    size_t col
+    index_t row,
+    index_t col
   );
 
   /* #endregion */
@@ -237,7 +237,7 @@ private:
    *
    * @returns number of mines
    */
-  size_t calculateNrOfMines();
+  index_t calculateNrOfMines();
 
   /**
    * @brief Get the field index from a tile position.
@@ -249,9 +249,9 @@ private:
    *
    * @returns field vector index
    */
-  inline size_t getTilePosition(
-    size_t row,
-    size_t col
+  inline index_t getTilePosition(
+    index_t row,
+    index_t col
   );
 
   /**
@@ -264,8 +264,8 @@ private:
    * @returns the selected tile
    */
   tile_t &getTile(
-    size_t row,
-    size_t col,
+    index_t row,
+    index_t col,
     bool &o_is_valid
   );
 
@@ -274,10 +274,10 @@ private:
 private:
   MW_DECLARE_LOGGER;
 
-  field_size_t current_field_size;
-  size_t nr_of_mines;
+  field_index_t current_field_size;
+  index_t nr_of_mines;
 
-  size_t field_size;
+  index_t field_size;
   std::vector<tile_t> field;
   bool field_inizialized;
 

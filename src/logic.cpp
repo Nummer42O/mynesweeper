@@ -15,20 +15,15 @@
 Minefield::tile_t Minefield::default_tile = Minefield::tile_t{};
 
 const std::array<Minefield::tile_offset_t, 8ul> Minefield::offsets = {{
-    {-1, -1},
-    {-1, 0},
-    {-1, 1},
-    {0, -1},
-    {0, 1},
-    {1, -1},
-    {1, 0},
-    {1, 1},
+  {-1, -1}, { 0, -1}, { 1, -1},
+  {-1,  0},           { 1,  0},
+  {-1,  1}, { 0,  1}, { 1,  1},
 }};
 
 
 /* #region minefield generation */
 
-Minefield::Minefield(size_t rows, size_t cols) : current_field_size{rows, cols}
+Minefield::Minefield(index_t rows, index_t cols) : current_field_size{rows, cols}
 {
   MW_SET_CLASS_ORIGIN;
   MW_SET_FUNC_SCOPE;
@@ -43,7 +38,7 @@ Minefield::Minefield(size_t rows, size_t cols) : current_field_size{rows, cols}
   this->field_inizialized = false;
 }
 
-void Minefield::resize(size_t rows, size_t cols)
+void Minefield::resize(index_t rows, index_t cols)
 {
   MW_SET_FUNC_SCOPE;
 
@@ -77,7 +72,7 @@ void Minefield::initFields()
 
   // make list of indices
   std::vector<int64_t> field_indices(this->field_size);
-  std::iota(field_indices.begin(), field_indices.end(), 0ul);
+  std::iota(field_indices.begin(), field_indices.end(), 0l);
 
   // prepare for list of mine indices
   std::vector<int64_t> mine_indies;
@@ -109,8 +104,8 @@ void Minefield::initFields()
         continue;
 
       tile_t &current_tile = this->field.at(this->getTilePosition(
-        static_cast<size_t>(current_row),
-        static_cast<size_t>(current_col)
+        static_cast<index_t>(current_row),
+        static_cast<index_t>(current_col)
       ));
       current_tile.nr_surrounding_mines++;
     }
@@ -120,7 +115,7 @@ void Minefield::initFields()
 /* #endregion */
 /* #region field manipulation */
 
-bool Minefield::activateField(size_t row, size_t col, cascade_t &o_revealed_fields, bool & o_has_revealed_mine)
+bool Minefield::activateField(index_t row, index_t col, cascade_t &o_revealed_fields, bool & o_has_revealed_mine)
 {
   // return (this->*(this->activate_field_callback))(row, col, o_revealed_fields, o_has_revealed_mine);
   if (this->field_inizialized)
@@ -133,7 +128,7 @@ bool Minefield::activateField(size_t row, size_t col, cascade_t &o_revealed_fiel
   }
 }
 
-bool Minefield::undoFieldActivation(size_t row, size_t col)
+bool Minefield::undoFieldActivation(index_t row, index_t col)
 {
   MW_SET_FUNC_SCOPE;
 
@@ -153,7 +148,7 @@ bool Minefield::undoFieldActivation(size_t row, size_t col)
   return true;
 }
 
-bool Minefield::toggleFieldFlag(size_t row, size_t col, bool &o_is_flagged)
+bool Minefield::toggleFieldFlag(index_t row, index_t col, bool &o_is_flagged)
 {
   MW_SET_FUNC_SCOPE;
 
@@ -187,14 +182,13 @@ bool Minefield::toggleFieldFlag(size_t row, size_t col, bool &o_is_flagged)
 void Minefield::revealFieldsForUser(cascade_t &o_revealed_fields)
 {
   /**
-   * TODO: implement
-   *  1. generate list of all unrevealed tiles adjacent to revealed ones
-   *  2. iterate over those and check if revealing those would solve the problem
-   *  3. if none of those solve the problem, reveal any of them, remove it from list and repeat from 2.
+   * 1. generate list of all unrevealed tiles adjacent to revealed ones
+   * 2. iterate over those and check if revealing those would solve the problem
+   * 3. if none of those solve the problem, reveal any of them, remove it from list and repeat from 2.
    */
 }
 
-bool Minefield::activateFieldInitial(size_t row, size_t col, std::vector<tile_with_position_t> &o_revealed_fields, bool &o_has_revealed_mine)
+bool Minefield::activateFieldInitial(index_t row, index_t col, std::vector<tile_with_position_t> &o_revealed_fields, bool &o_has_revealed_mine)
 {
   MW_SET_FUNC_SCOPE
 
@@ -266,10 +260,10 @@ bool Minefield::activateFieldInitial(size_t row, size_t col, std::vector<tile_wi
         // if we hit an "empty" (no adjacent mines) reveal, add all adjacent fields to the queue
         if (current_tile.nr_surrounding_mines == 0)
         {
-          size_t above = current_tile_pos.row - 1ul,
-                 below = current_tile_pos.row + 1ul,
-                 left = current_tile_pos.col - 1ul,
-                 right = current_tile_pos.col + 1ul;
+          index_t above = current_tile_pos.row - 1l,
+                 below = current_tile_pos.row + 1l,
+                 left = current_tile_pos.col - 1l,
+                 right = current_tile_pos.col + 1l;
 
           field_queue.push(tile_position_t{above, left});
           field_queue.push(tile_position_t{above, current_tile_pos.col});
@@ -291,9 +285,9 @@ bool Minefield::activateFieldInitial(size_t row, size_t col, std::vector<tile_wi
 
 #ifdef MW_DEBUG
   bool is_valid;
-  for (size_t row = 0ul; row < this->current_field_size.rows; row++)
+  for (index_t row = 0l; row < this->current_field_size.rows; row++)
   {
-    for (size_t col = 0ul; col < this->current_field_size.cols; col++)
+    for (index_t col = 0l; col < this->current_field_size.cols; col++)
     {
       Minefield::tile_t tile = this->getTile(row, col, is_valid);
 
@@ -307,7 +301,7 @@ bool Minefield::activateFieldInitial(size_t row, size_t col, std::vector<tile_wi
   return true;
 }
 
-bool Minefield::activateFieldMain(size_t row, size_t col, std::vector<tile_with_position_t> &o_revealed_fields, bool &o_has_revealed_mine)
+bool Minefield::activateFieldMain(index_t row, index_t col, std::vector<tile_with_position_t> &o_revealed_fields, bool &o_has_revealed_mine)
 {
   MW_SET_FUNC_SCOPE;
 
@@ -336,10 +330,10 @@ bool Minefield::activateFieldMain(size_t row, size_t col, std::vector<tile_with_
   {
     // tile is revealed and is surrounded by as many flagged fields as there are mines around it
 
-    size_t above = current_tile_pos.row - 1ul,
-           below = current_tile_pos.row + 1ul,
-           left = current_tile_pos.col - 1ul,
-           right = current_tile_pos.col + 1ul;
+    index_t above = current_tile_pos.row - 1l,
+           below = current_tile_pos.row + 1l,
+           left = current_tile_pos.col - 1l,
+           right = current_tile_pos.col + 1l;
 
     field_queue.push(tile_position_t{above, left});
     field_queue.push(tile_position_t{above, current_tile_pos.col});
@@ -413,10 +407,10 @@ bool Minefield::activateFieldMain(size_t row, size_t col, std::vector<tile_with_
     // if we hit an "empty" (no adjacent mines) reveal, add all adjacent fields to the queue
     if (current_tile.nr_surrounding_mines == 0)
     {
-      size_t above = current_tile_pos.row - 1ul,
-             below = current_tile_pos.row + 1ul,
-             left = current_tile_pos.col - 1ul,
-             right = current_tile_pos.col + 1ul;
+      index_t above = current_tile_pos.row - 1l,
+             below = current_tile_pos.row + 1l,
+             left = current_tile_pos.col - 1l,
+             right = current_tile_pos.col + 1l;
 
       field_queue.push(tile_position_t{above, left});
       field_queue.push(tile_position_t{above, current_tile_pos.col});
@@ -439,10 +433,10 @@ bool Minefield::checkGameWon()
 {
   MW_SET_FUNC_SCOPE;
 
-  size_t
-      revealed_tiles_count = 0ul,
-      correctly_flagged_mines_count = 0ul;
-  const size_t non_mine_tiles_count = this->field_size - this->nr_of_mines;
+  index_t
+      revealed_tiles_count = 0l,
+      correctly_flagged_mines_count = 0l;
+  const index_t non_mine_tiles_count = this->field_size - this->nr_of_mines;
 
   for (const tile_t &current_tile : this->field)
   {
@@ -463,9 +457,9 @@ bool Minefield::checkHasAvailableMoves()
 {
   MW_SET_FUNC_SCOPE
 
-  for (size_t row = 0ul; row < this->current_field_size.rows; row++)
+  for (index_t row = 0l; row < this->current_field_size.rows; row++)
   {
-    for (size_t col = 0ul; col < this->current_field_size.cols; col++)
+    for (index_t col = 0l; col < this->current_field_size.cols; col++)
     {
       tile_t current_tile = this->field[this->getTilePosition(row, col)];
 
@@ -475,10 +469,10 @@ bool Minefield::checkHasAvailableMoves()
       uint8_t surrounding_flags = 0u,
               surrounding_covered = 0u;
       {
-        size_t above = row - 1ul,
-               below = row + 1ul,
-               left = col - 1ul,
-               right = col + 1ul;
+        index_t above = row - 1l,
+               below = row + 1l,
+               left = col - 1l,
+               right = col + 1l;
         std::array<tile_position_t, 8ul> surrounding_tiles{
             tile_position_t{above, left},
             tile_position_t{above, col},
@@ -508,7 +502,6 @@ bool Minefield::checkHasAvailableMoves()
         }
       }
 
-      // TODO: continue here, this logic needs to be redone
       const bool flagged_all_mines = (surrounding_flags == current_tile.nr_surrounding_mines);
       if ((flagged_all_mines && surrounding_covered > 0) ||
           (!flagged_all_mines && surrounding_covered == (current_tile.nr_surrounding_mines - surrounding_flags)))
@@ -524,7 +517,7 @@ bool Minefield::checkHasAvailableMoves()
   return false;
 }
 
-bool Minefield::checkMineCountSatisfied(size_t row, size_t col)
+bool Minefield::checkMineCountSatisfied(index_t row, index_t col)
 {
   MW_SET_FUNC_SCOPE;
 
@@ -540,10 +533,10 @@ bool Minefield::checkMineCountSatisfied(size_t row, size_t col)
   uint8_t mine_count = 0u;
 
   //! TODO: maybe rewrite without loop - the array size won't change anyways
-  size_t above = row - 1ul,
-         below = row + 1ul,
-         left  = col - 1ul,
-         right = col + 1ul;
+  index_t above = row - 1l,
+         below = row + 1l,
+         left  = col - 1l,
+         right = col + 1l;
   std::array<tile_position_t, 8ul> surrounding_tiles{
       tile_position_t{above, left},
       tile_position_t{above, col},
@@ -576,26 +569,26 @@ bool Minefield::checkMineCountSatisfied(size_t row, size_t col)
 /* #endregion */
 /* #region getters */
 
-const size_t &Minefield::getNrMines()
+const index_t &Minefield::getNrMines()
 {
   MW_SET_FUNC_SCOPE;
 
   return this->nr_of_mines;
 }
 
-size_t Minefield::calculateNrOfMines()
+index_t Minefield::calculateNrOfMines()
 {
   MW_SET_FUNC_SCOPE;
 
   return DEFAULT_BOMB_FACTOR * this->field_size;
 }
 
-inline size_t Minefield::getTilePosition(size_t row, size_t col)
+inline index_t Minefield::getTilePosition(index_t row, index_t col)
 {
   return row * this->current_field_size.cols + col;
 }
 
-Minefield::tile_t &Minefield::getTile(size_t row, size_t col, bool &o_is_valid)
+Minefield::tile_t &Minefield::getTile(index_t row, index_t col, bool &o_is_valid)
 {
   MW_SET_FUNC_SCOPE;
 

@@ -43,8 +43,8 @@ private:
    */
   NewGameDialog::ReturnType showNewGame(
     NewGameDialog::Type type,
-    size_t &o_rows,
-    size_t &o_cols
+    index_t &o_rows,
+    index_t &o_cols
   );
 
   /**
@@ -66,8 +66,8 @@ private:
    */
   void clickedCallback(
     bool is_reveal,
-    size_t row,
-    size_t col
+    index_t row,
+    index_t col
   );
 
   /**
@@ -77,8 +77,8 @@ private:
    * @param col the column of the clicked tile
    */
   void revealCallback(
-    size_t row,
-    size_t col
+    index_t row,
+    index_t col
   );
 
   /**
@@ -88,8 +88,8 @@ private:
    * @param col the column of the clicked tile
    */
   void flagCallback(
-    size_t row,
-    size_t col
+    index_t row,
+    index_t col
   );
 
   /* #endregion */
@@ -127,5 +127,5 @@ private:
   std::shared_ptr<NewGameDialog> new_game_dialog = nullptr;
   std::shared_ptr<NoMovesLeftDialog> no_moves_left_dialog = nullptr;
 
-  field_size_t current_field_size;
+  field_index_t current_field_size;
 };

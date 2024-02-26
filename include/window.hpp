@@ -45,8 +45,8 @@ public:
    * @param as type of field
    */
   void revealField(
-    size_t row,
-    size_t col,
+    index_t row,
+    index_t col,
     int as
   );
 
@@ -57,8 +57,8 @@ public:
    * @param col column / x coordinate
    */
   void undoFieldReveal(
-    size_t row,
-    size_t col
+    index_t row,
+    index_t col
   );
 
   /**
@@ -68,8 +68,8 @@ public:
    * @param col column / x coordinate
    */
   void setFieldFlag(
-    size_t row,
-    size_t col,
+    index_t row,
+    index_t col,
     bool flag
   );
 
@@ -81,9 +81,9 @@ public:
    * @param nr_bombs the maximum number of bombs to be found
    */
   void generateMinefield(
-    size_t rows,
-    size_t cols,
-    size_t nr_bombs
+    index_t rows,
+    index_t cols,
+    index_t nr_bombs
   );
 
   /**
@@ -94,7 +94,7 @@ public:
   /**
    * @brief Check the soft maximum rows and columns for the current window size.
    */
-  field_size_t getMaxFieldSize();
+  field_index_t getMaxFieldSize();
 
 private:
   /**
@@ -119,14 +119,14 @@ private:
    *
    * @return a pointer to the tile
    */
-  inline Tile *getTile(size_t row, size_t col);
+  inline Tile *getTile(index_t row, index_t col);
 
 private:
   MW_DECLARE_LOGGER;
 
-  size_t  current_mines = 0ul,
+  index_t  current_mines = 0l,
           current_max_mines;
-  field_size_t current_field_size;
+  field_index_t current_field_size;
 
   // 0: bomb, 1: empty, x (2-9): field nr x-2
   std::array<Glib::RefPtr<Gdk::Pixbuf>, 10ul> reveal_sprites;

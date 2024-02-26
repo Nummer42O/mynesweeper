@@ -6,12 +6,12 @@
 
 /* #region graphical configs */
 
-#define SPACING 5ul
+#define SPACING 5l
 
-#define TILE_SIZE 50ul
+#define TILE_SIZE 50l
 
-#define MIN_FIELD_ROWS 10ul
-#define MIN_FIELD_COLS 10ul
+#define MIN_FIELD_ROWS 10l
+#define MIN_FIELD_COLS 10l
 
 /*
 #define COLOR_FIELD_1 "ddfac3"
@@ -29,7 +29,7 @@
 
 #define DEFAULT_BOMB_FACTOR .1563
 
-#define MIN_INITIAL_FIELDS 3ul
+#define MIN_INITIAL_FIELDS 3l
 
 /* #endregion */
 /* #region build context */
@@ -49,12 +49,14 @@
 /* #endregion */
 /* #region general resources */
 
+typedef int64_t index_t;
+
 typedef struct
 {
-  size_t
-    rows = 0ul,
-    cols = 0ul;
-} field_size_t;
+  index_t
+    rows = 0l,
+    cols = 0l;
+} field_index_t;
 
 typedef Glib::RefPtr<Gdk::Pixbuf> sprite_t;
 typedef struct {

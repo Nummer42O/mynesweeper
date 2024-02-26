@@ -72,7 +72,7 @@ void Window::bindRestartButtonCallback(restart_button_callback_t callback)
   restart_button_callback_connection = std::move(this->restart_widget.signal_clicked().connect(callback, true));
 }
 
-void Window::revealField(size_t row, size_t col, int as)
+void Window::revealField(index_t row, index_t col, int as)
 {
   MW_SET_FUNC_SCOPE;
 
@@ -81,7 +81,7 @@ void Window::revealField(size_t row, size_t col, int as)
   this->getTile(row, col)->revealAs(this->reveal_sprites.at(as + 1));
 }
 
-void Window::undoFieldReveal(size_t row, size_t col)
+void Window::undoFieldReveal(index_t row, index_t col)
 {
   MW_SET_FUNC_SCOPE;
 
@@ -90,7 +90,7 @@ void Window::undoFieldReveal(size_t row, size_t col)
   this->getTile(row, col)->reset();
 }
 
-void Window::setFieldFlag(size_t row, size_t col, bool flag)
+void Window::setFieldFlag(index_t row, index_t col, bool flag)
 {
   MW_SET_FUNC_SCOPE;
 
@@ -112,16 +112,16 @@ void Window::setFieldFlag(size_t row, size_t col, bool flag)
   }
 }
 
-void Window::generateMinefield(size_t rows, size_t cols, size_t nr_bombs)
+void Window::generateMinefield(index_t rows, index_t cols, index_t nr_bombs)
 {
   MW_SET_FUNC_SCOPE;
 
-  const size_t  old_tile_count = this->current_field_size.rows * this->current_field_size.cols,
+  const index_t  old_tile_count = this->current_field_size.rows * this->current_field_size.cols,
                 new_tile_count = rows * cols;
 
   if (new_tile_count > old_tile_count)
   {
-    for (size_t idx = old_tile_count; idx < new_tile_count; idx++)
+    for (index_t idx = old_tile_count; idx < new_tile_count; idx++)
     {
       Tile *new_tile = Gtk::make_managed<Tile>(this->shared_tile_clicked_callback, this->flagged_sprites, this->untouched_sprites);
       this->field_widget.add(*new_tile);
@@ -139,9 +139,9 @@ void Window::generateMinefield(size_t rows, size_t cols, size_t nr_bombs)
   }
 
   std::vector<Gtk::Widget *> children = this->field_widget.get_children();
-  for (size_t idx = 0ul; idx < new_tile_count; idx++)
+  for (index_t idx = 0l; idx < new_tile_count; idx++)
   {
-    const size_t  row = idx / cols,
+    const index_t  row = idx / cols,
                   col = idx % cols;
 
     Tile *tile = static_cast<Tile *>(children.at(idx));
@@ -161,7 +161,7 @@ void Window::generateMinefield(size_t rows, size_t cols, size_t nr_bombs)
   this->current_max_mines = nr_bombs;
   this->current_field_size = {rows, cols};
 
-  this->current_mines = 0ul;
+  this->current_mines = 0l;
   this->setMinesDisplay();
 }
 
@@ -174,11 +174,11 @@ void Window::resetMinefield()
     static_cast<Tile *>(widget)->reset();
   }
 
-  this->current_mines = 0ul;
+  this->current_mines = 0l;
   this->setMinesDisplay();
 }
 
-field_size_t Window::getMaxFieldSize()
+field_index_t Window::getMaxFieldSize()
 {
   MW_SET_FUNC_SCOPE;
 
@@ -188,7 +188,7 @@ field_size_t Window::getMaxFieldSize()
   int width  = scrolled_base->get_width(),
       height = scrolled_base->get_height();
 
-  return field_size_t{(height - SPACING) / (SPACING + TILE_SIZE), (width - SPACING) / (SPACING + TILE_SIZE)};
+  return field_index_t{(height - SPACING) / (SPACING + TILE_SIZE), (width - SPACING) / (SPACING + TILE_SIZE)};
 }
 
 void Window::setMinesDisplay()
@@ -209,9 +209,9 @@ bool Window::loadSprites()
   {
     this->reveal_sprites.at(0ul) = Gdk::Pixbuf::create_from_file(SPRITE_DIRECTORY "/mine.bmp");
     this->reveal_sprites.at(1ul) = Gdk::Pixbuf::create_from_file(SPRITE_DIRECTORY "/revealed.bmp");
-    for (size_t idx = 1ul; idx < 9; idx++)
+    for (index_t idx = 1l; idx < 9; idx++)
     {
-      this->reveal_sprites.at(idx + 1ul) = Gdk::Pixbuf::create_from_file(SPRITE_DIRECTORY "/" + std::to_string(idx) + ".bmp");
+      this->reveal_sprites.at(idx + 1l) = Gdk::Pixbuf::create_from_file(SPRITE_DIRECTORY "/" + std::to_string(idx) + ".bmp");
     }
 
     untouched_sprites.normal = Gdk::Pixbuf::create_from_file(SPRITE_DIRECTORY "/untouched_normal.bmp");
@@ -236,7 +236,7 @@ bool Window::loadSprites()
   return true;
 }
 
-inline Tile *Window::getTile(size_t row, size_t col)
+inline Tile *Window::getTile(index_t row, index_t col)
 {
   return static_cast<Tile *>(this->field_widget.get_child_at(col, row));
 }
