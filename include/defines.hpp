@@ -29,7 +29,7 @@
 
 #define DEFAULT_BOMB_FACTOR .1563
 
-#define MIN_INITIAL_FIELDS 3l
+#define MIN_INITIAL_FIELDS 7l
 
 /* #endregion */
 /* #region build context */
