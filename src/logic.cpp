@@ -240,6 +240,13 @@ bool Minefield::undoTileReveal(index_t row, index_t col)
   tile_t &tile = this->getTile(row, col);
 
   tile.is_revealed = false;
+  this->forSurroundingMines(
+    row, col,
+    [](tile_t &surrounding_tile)
+    {
+      surrounding_tile.nr_surrounding_untouched++;
+    }
+  );
 
   return true;
 }
@@ -247,13 +254,6 @@ bool Minefield::undoTileReveal(index_t row, index_t col)
 bool Minefield::toggleTileFlag(index_t row, index_t col, bool &o_is_flagged)
 {
   MW_SET_FUNC_SCOPE;
-
-  if (!this->field_inizialized)
-  {
-    MW_LOG(warning) << "field not initialized yet";
-
-    return false;
-  }
 
   if (!this->tilePositionValid(row, col))
   {
@@ -270,6 +270,29 @@ bool Minefield::toggleTileFlag(index_t row, index_t col, bool &o_is_flagged)
 
   tile.is_flagged = !tile.is_flagged;
   o_is_flagged = (tile.is_flagged);
+
+  //! NOTE: not beautiful but better then dealing with capturing lambda expressions
+  //! TODO: maybe look into how to make this.. better
+  if (o_is_flagged)
+  {
+    this->forSurroundingMines(
+      row, col,
+      [](tile_t &surrounding_tile)
+      {
+        surrounding_tile.nr_surrounding_flags++;
+      }
+    );
+  }
+  else
+  {
+    this->forSurroundingMines(
+      row, col,
+      [](tile_t &surrounding_tile)
+      {
+        surrounding_tile.nr_surrounding_flags--;
+      }
+    );
+  }
 
   return true;
 }
@@ -355,6 +378,13 @@ void Minefield::revealTileInternal(index_t row, index_t col, std::vector<tile_wi
 
     // should be revealed now
     current_tile.is_revealed = true;
+    this->forSurroundingMines(
+      current_tile_pos.row, current_tile_pos.col,
+      [](tile_t &surrounding_tile)
+      {
+        surrounding_tile.nr_surrounding_untouched--;
+      }
+    );
 
     // check if we hit a mine
     if (current_tile.is_mine)
