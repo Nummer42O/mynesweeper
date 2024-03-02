@@ -53,6 +53,7 @@ private:
     index_t row, col;
   } tile_position_t;
   friend inline bool operator==(const tile_position_t &left, const tile_position_t &right);
+  friend inline bool operator<(const tile_position_t &left, const tile_position_t &right);
 
   typedef struct
   {
@@ -180,8 +181,14 @@ private:
 
   /**
    * @brief Assign random states to the fields.
+   *
+   * @param row row / y coordinate of the initial patch source tile
+   * @param col column / x coordinate of the initial patch source tile
    */
-  void initFields();
+  void initFields(
+    index_t row,
+    index_t col
+  );
 
   /* #endregion */
   /* #region field manipulation */
@@ -258,7 +265,7 @@ private:
    *
    * @returns field vector index
    */
-  inline index_t getTilePosition(
+  inline index_t getTileIndex(
     index_t row,
     index_t col
   );
@@ -292,4 +299,5 @@ private:
 
   static tile_t default_tile;
   static const std::array<tile_offset_t, 8ul> offsets;
+  static const std::array<tile_offset_t, 4ul> directions;
 };

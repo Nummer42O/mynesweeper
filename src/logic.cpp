@@ -7,6 +7,7 @@
 #include <cassert>
 #include <numeric>
 #include <array>
+#include <set>
 
 #include <iostream>
 #include <iomanip>
@@ -15,15 +16,31 @@
 Minefield::tile_t Minefield::default_tile = Minefield::tile_t{};
 
 const std::array<Minefield::tile_offset_t, 8ul> Minefield::offsets = {{
-  {-1, -1}, { 0, -1}, { 1, -1},
-  {-1,  0},           { 1,  0},
-  {-1,  1}, { 0,  1}, { 1,  1},
+  {-1l, -1l}, { 0l, -1l}, { 1l, -1l},
+  {-1l,  0l},             { 1l,  0l},
+  {-1l,  1l}, { 0l,  1l}, { 1l,  1l},
+}};
+
+const std::array<Minefield::tile_offset_t, 4ul> Minefield::directions = {{
+              { 0l, -1l},
+  {-1l,  0l},             { 1l,  0l},
+              { 0l,  1l},
 }};
 
 
 inline bool operator==(const Minefield::tile_position_t &left, const Minefield::tile_position_t &right)
 {
   return left.row == right.row && left.col == right.col;
+}
+
+inline bool operator<(const Minefield::tile_position_t &left, const Minefield::tile_position_t &right)
+{
+  if (left.row == right.row)
+  {
+    return left.col < right.col;
+  }
+
+  return left.row < right.row;
 }
 
 
@@ -69,50 +86,107 @@ void Minefield::reset()
   this->field_inizialized = false;
 }
 
-void Minefield::initFields()
+void Minefield::initFields(index_t row, index_t col)
 {
   MW_SET_FUNC_SCOPE;
+
+  // setup random device
+  std::random_device random_device;
+  std::mt19937 mersenne_twister(random_device());
+  std::uniform_int_distribution<size_t> random_direction_idx(0ul, 3ul);
 
   // reset field
   std::fill(this->field.begin(), this->field.end(), tile_t());
 
-  // make list of indices
-  std::vector<int64_t> field_indices(this->field_size);
-  std::iota(field_indices.begin(), field_indices.end(), 0l);
+  // generate initial patch
+  std::set<tile_position_t> initial_patch = {{tile_position_t{row, col}}};
+  while (initial_patch.size() < MIN_INITIAL_FIELDS)
+  {
+    std::set<tile_position_t> initial_patch_copy(initial_patch);
+    for (const tile_position_t &tile: initial_patch_copy)
+    {
+      const tile_offset_t &offset = this->directions[random_direction_idx(mersenne_twister)];
+      initial_patch.insert(tile_position_t{tile.row + offset.rows, tile.col + offset.cols});
+    }
+  }
 
-  // prepare for list of mine indices
-  std::vector<int64_t> mine_indies;
-  std::random_device random_device;
-  std::mt19937 mersenne_twister(random_device());
+# ifdef MW_DEBUG
+  std::stringstream patch;
+  patch << "initial patch: ";
+  for (const tile_position_t& tile_pos: initial_patch)
+  {
+    patch << '(' << tile_pos.row << ", " << tile_pos.col << ") ";
+  }
+  MW_LOG(debug) << patch.str();
+# endif //defined(MW_DEBUG)
+
+  // preparation for sampling
+  std::vector<tile_position_t> \
+    possible_mine_positions(this->field_size - initial_patch.size()),
+    mine_positions;
+  index_t tile_position_index = 0l;
+  std::generate(
+    possible_mine_positions.begin(), possible_mine_positions.end(),
+    [&]()
+    {
+      tile_position_t tile_position;
+      do
+      {
+        assert(tile_position_index < this->field_size);
+
+        tile_position = tile_position_t{
+          /*rows = */ tile_position_index / this->current_field_size.cols,
+          /*cols = */ tile_position_index % this->current_field_size.cols
+        };
+        tile_position_index++;
+      }
+      while (initial_patch.contains(tile_position));
+
+      return tile_position;
+    }
+  );
 
   // sample mine indices
+  mine_positions.reserve(this->nr_of_mines);
   std::sample(
-      field_indices.begin(), field_indices.end(),
-      std::back_inserter(mine_indies),
-      this->nr_of_mines,
-      mersenne_twister);
+    possible_mine_positions.begin(), possible_mine_positions.end(),
+    std::back_inserter(mine_positions),
+    this->nr_of_mines,
+    mersenne_twister
+  );
+
+# ifdef MW_DEBUG
+  std::stringstream mines;
+  mines << "mines: ";
+  for (const tile_position_t& tile_pos: mine_positions)
+  {
+    mines << '(' << tile_pos.row << ", " << tile_pos.col << ") ";
+  }
+  MW_LOG(debug) << mines.str();
+# endif //defined(MW_DEBUG)
 
   // apply mine indices
-  for (const int64_t &idx : mine_indies)
+  bool tile_is_valid;
+  for (const tile_position_t &tile_pos : mine_positions)
   {
-    this->field.at(idx).is_mine = true;
+    this->field.at(this->getTileIndex(tile_pos.row, tile_pos.col)).is_mine = true;
 
-    int64_t row = idx / this->current_field_size.cols,
-            col = idx % this->current_field_size.cols;
-
-    for (const tile_offset_t offset : this->offsets)
+    for (const tile_offset_t &offset : this->offsets)
     {
-      int64_t current_row = row + offset.rows,
-              current_col = col + offset.cols;
+      index_t \
+        current_row = tile_pos.row + offset.rows,
+        current_col = tile_pos.col + offset.cols;
 
-      if (current_row < 0 || current_row >= this->current_field_size.rows ||
-          current_col < 0 || current_col >= this->current_field_size.cols)
-        continue;
+      tile_t &current_tile = this->getTile(current_row, current_col, tile_is_valid);
+      if (!tile_is_valid) continue;
 
-      tile_t &current_tile = this->field.at(this->getTilePosition(
-        static_cast<index_t>(current_row),
-        static_cast<index_t>(current_col)
-      ));
+      MW_LOG(debug)
+        << "row=" << tile_pos.row
+        << " col=" << tile_pos.col
+        << " current row=" << current_row
+        << " current col=" << current_col
+        << " tile is valid: " << std::boolalpha << tile_is_valid;
+
       current_tile.nr_surrounding_mines++;
     }
   }
@@ -208,83 +282,8 @@ bool Minefield::activateFieldInitial(index_t row, index_t col, std::vector<tile_
     return false;
   }
 
-  // reinitialize until enough fields are revealed without hitting a bomb
-  do
-  {
-    this->initFields();
-
-    {
-      // initialize queue for field cascade
-      o_revealed_fields.clear();
-      std::queue<tile_position_t> field_queue;
-      field_queue.push(tile_position_t{row, col});
-
-      // by default we don't expect to hit a mine, if we hit one this will be overwritten
-      o_has_revealed_mine = false;
-      do
-      {
-        // get queue element
-        tile_position_t current_tile_pos = std::move(field_queue.front());
-        field_queue.pop();
-
-        // check tile validity
-        bool tile_is_valid;
-        tile_t &current_tile = this->getTile(current_tile_pos.row, current_tile_pos.col, tile_is_valid);
-        if (!tile_is_valid)
-        {
-          // field does not exist
-
-          continue;
-        }
-
-        // check if we need to evaluate further
-        if (current_tile.is_revealed)
-        {
-          // already "revealed" thus not interesting
-
-          continue;
-        }
-
-        // should be revealed now
-        current_tile.is_revealed = true;
-
-        // check if we hit a mine
-        if (current_tile.is_mine)
-        {
-          // signal that a mine is revealed and stop since further evaluation is not needed
-
-          o_has_revealed_mine = true;
-          o_revealed_fields.push_back(tile_with_position_t{current_tile_pos.row, current_tile_pos.col, -1});
-
-          break;
-        }
-        else
-        {
-          o_revealed_fields.push_back(tile_with_position_t{current_tile_pos.row, current_tile_pos.col, current_tile.nr_surrounding_mines});
-        }
-
-        // if we hit an "empty" (no adjacent mines) reveal, add all adjacent fields to the queue
-        if (current_tile.nr_surrounding_mines == 0)
-        {
-          index_t above = current_tile_pos.row - 1l,
-                 below = current_tile_pos.row + 1l,
-                 left = current_tile_pos.col - 1l,
-                 right = current_tile_pos.col + 1l;
-
-          field_queue.push(tile_position_t{above, left});
-          field_queue.push(tile_position_t{above, current_tile_pos.col});
-          field_queue.push(tile_position_t{above, right});
-          field_queue.push(tile_position_t{current_tile_pos.row, left});
-          field_queue.push(tile_position_t{current_tile_pos.row, right});
-          field_queue.push(tile_position_t{below, left});
-          field_queue.push(tile_position_t{below, current_tile_pos.col});
-          field_queue.push(tile_position_t{below, right});
-        }
-      } while (!field_queue.empty());
-    }
-
-    MW_LOG(debug) << "revealed mine: " << std::boolalpha << o_has_revealed_mine << " nr revealed fields: " << o_revealed_fields.size();
-  } while (o_has_revealed_mine || (o_revealed_fields.size() < MIN_INITIAL_FIELDS));
+  this->initFields(row, col);
+  this->activateFieldMain(row, col, o_revealed_fields, o_has_revealed_mine);
 
   // from this point forth use the "normal" activation function
   this->field_inizialized = true;
@@ -467,7 +466,7 @@ bool Minefield::checkHasAvailableMoves()
   {
     for (index_t col = 0l; col < this->current_field_size.cols; col++)
     {
-      tile_t current_tile = this->field[this->getTilePosition(row, col)];
+      tile_t current_tile = this->field[this->getTileIndex(row, col)];
 
       if (!current_tile.is_revealed || (current_tile.is_revealed && current_tile.nr_surrounding_mines == 0))
         continue;
@@ -589,7 +588,7 @@ index_t Minefield::calculateNrOfMines()
   return DEFAULT_BOMB_FACTOR * this->field_size;
 }
 
-inline index_t Minefield::getTilePosition(index_t row, index_t col)
+inline index_t Minefield::getTileIndex(index_t row, index_t col)
 {
   return row * this->current_field_size.cols + col;
 }
@@ -609,7 +608,7 @@ Minefield::tile_t &Minefield::getTile(index_t row, index_t col, bool &o_is_valid
   }
   else
   {
-    return this->field[this->getTilePosition(row, col)];
+    return this->field[this->getTileIndex(row, col)];
   }
 }
 
