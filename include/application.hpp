@@ -127,5 +127,5 @@ private:
   std::shared_ptr<NewGameDialog> new_game_dialog = nullptr;
   std::shared_ptr<NoMovesLeftDialog> no_moves_left_dialog = nullptr;
 
-  field_index_t current_field_size;
+  field_size_t current_field_size;
 };

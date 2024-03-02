@@ -53,10 +53,10 @@ typedef int64_t index_t;
 
 typedef struct
 {
-  index_t
+  index_t \
     rows = 0l,
     cols = 0l;
-} field_index_t;
+} field_size_t;
 
 typedef Glib::RefPtr<Gdk::Pixbuf> sprite_t;
 typedef struct {

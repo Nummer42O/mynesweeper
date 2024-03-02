@@ -283,7 +283,7 @@ private:
 private:
   MW_DECLARE_LOGGER;
 
-  field_index_t current_field_size;
+  field_size_t current_field_size;
   index_t nr_of_mines;
 
   index_t field_size;

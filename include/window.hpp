@@ -94,7 +94,7 @@ public:
   /**
    * @brief Check the soft maximum rows and columns for the current window size.
    */
-  field_index_t getMaxFieldSize();
+  field_size_t getMaxFieldSize();
 
 private:
   /**
@@ -126,7 +126,7 @@ private:
 
   index_t  current_mines = 0l,
           current_max_mines;
-  field_index_t current_field_size;
+  field_size_t current_field_size;
 
   // 0: bomb, 1: empty, x (2-9): field nr x-2
   std::array<Glib::RefPtr<Gdk::Pixbuf>, 10ul> reveal_sprites;

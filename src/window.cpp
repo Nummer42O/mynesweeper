@@ -178,7 +178,7 @@ void Window::resetMinefield()
   this->setMinesDisplay();
 }
 
-field_index_t Window::getMaxFieldSize()
+field_size_t Window::getMaxFieldSize()
 {
   MW_SET_FUNC_SCOPE;
 
@@ -188,7 +188,7 @@ field_index_t Window::getMaxFieldSize()
   int width  = scrolled_base->get_width(),
       height = scrolled_base->get_height();
 
-  return field_index_t{(height - SPACING) / (SPACING + TILE_SIZE), (width - SPACING) / (SPACING + TILE_SIZE)};
+  return field_size_t{(height - SPACING) / (SPACING + TILE_SIZE), (width - SPACING) / (SPACING + TILE_SIZE)};
 }
 
 void Window::setMinesDisplay()

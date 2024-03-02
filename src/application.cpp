@@ -44,7 +44,7 @@ NewGameDialog::ReturnType Application::showNewGame(NewGameDialog::Type type, ind
 {
   MW_SET_FUNC_SCOPE;
 
-  field_index_t theoretical_max = this->window->getMaxFieldSize();
+  field_size_t theoretical_max = this->window->getMaxFieldSize();
   NewGameDialog::ReturnType dialog_response = this->new_game_dialog->run(type,
     o_rows, theoretical_max.rows,
     o_cols, theoretical_max.cols
