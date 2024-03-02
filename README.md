@@ -25,6 +25,8 @@ Fell absolutely free to post Issues and PRs, but no guarantees.
 - [X] check performance of `Minefield::activateField` as member function pointer vs if statement
 - [X] make tiles hold their own copies of flagged and normal the sprite pointers
 - [X] show flag icon with mine counter
+- [ ] redo intiial reveal callback to generate left out pattern instead of randomly trying
+- [ ] constantly keep track of unrevealed tiles and "the border" so it does not get recalculated from scratch every step
 
 ## Requirements
 
