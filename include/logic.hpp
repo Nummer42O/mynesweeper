@@ -194,23 +194,6 @@ private:
   /* #region field manipulation */
 
   /**
-   * @brief Reveal the first field and will set of a reveal cascade.
-   *
-   * @param row row / y coordinate
-   * @param col column / x coordinate
-   * @param o_revealed_fields vector of tiles that got revealed in cascade
-   * @param o_has_revealed_mine wether @ref `o_revealed_fields` contains a mine or not
-   *
-   * @returns true if the position was valid, false otherwise
-   */
-  bool activateFieldInitial(
-    index_t row,
-    index_t col,
-    std::vector<tile_with_position_t> &o_revealed_fields,
-    bool &o_has_revealed_mine
-  );
-
-  /**
    * @brief Attempt to reveal the field and may set of a reveal cascade.
    *
    * @param row row / y coordinate

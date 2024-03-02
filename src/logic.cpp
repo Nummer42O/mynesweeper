@@ -179,12 +179,6 @@ void Minefield::initFields(index_t row, index_t col)
       if (!this->tilePositionValid(current_row, current_col)) continue;
       tile_t &current_tile = this->getTile(current_row, current_col);
 
-      MW_LOG(debug)
-        << "row=" << tile_pos.row
-        << " col=" << tile_pos.col
-        << " current row=" << current_row
-        << " current col=" << current_col;
-
       current_tile.nr_surrounding_mines++;
     }
   }
@@ -195,15 +189,38 @@ void Minefield::initFields(index_t row, index_t col)
 
 bool Minefield::activateField(index_t row, index_t col, cascade_t &o_revealed_fields, bool & o_has_revealed_mine)
 {
-  // return (this->*(this->activate_field_callback))(row, col, o_revealed_fields, o_has_revealed_mine);
-  if (this->field_inizialized)
+  MW_SET_FUNC_SCOPE;
+
+  MW_LOG(trace) << "activating at row=" << row << " col=" << col;
+
+  if (!this->tilePositionValid(row, col))
   {
-    return this->activateFieldMain(row, col, o_revealed_fields, o_has_revealed_mine);
+    MW_LOG_INVALID_TILE;
+
+    return false;
   }
-  else
+
+  if (!this->field_inizialized)
   {
-    return this->activateFieldInitial(row, col, o_revealed_fields, o_has_revealed_mine);
+    this->initFields(row, col);
+    this->field_inizialized = true;
+
+#   ifdef MW_DEBUG
+    for (index_t row = 0l; row < this->current_field_size.rows; row++)
+    {
+      for (index_t col = 0l; col < this->current_field_size.cols; col++)
+      {
+        Minefield::tile_t tile = this->getTile(row, col);
+
+        std::cout << std::setw(2) << (tile.is_mine ? -1 : tile.nr_surrounding_mines) << ' ';
+      }
+      std::cout << '\n';
+    }
+    std::cout.flush();
+#   endif // defined(MW_DEBUG)
   }
+
+  return this->activateFieldMain(row, col, o_revealed_fields, o_has_revealed_mine);
 }
 
 bool Minefield::undoFieldActivation(index_t row, index_t col)
@@ -264,91 +281,41 @@ void Minefield::revealFieldsForUser(cascade_t &o_revealed_fields)
    */
 }
 
-bool Minefield::activateFieldInitial(index_t row, index_t col, std::vector<tile_with_position_t> &o_revealed_fields, bool &o_has_revealed_mine)
-{
-  MW_SET_FUNC_SCOPE
-
-  MW_LOG(trace) << "activating at row=" << row << " col=" << col;
-
-  // don't even bother if the position is invalid
-  if (!(row < this->current_field_size.rows && col < this->current_field_size.cols))
-  {
-    MW_LOG_INVALID_TILE;
-
-    return false;
-  }
-
-  this->initFields(row, col);
-  this->activateFieldMain(row, col, o_revealed_fields, o_has_revealed_mine);
-
-  // from this point forth use the "normal" activation function
-  this->field_inizialized = true;
-
-#ifdef MW_DEBUG
-  for (index_t row = 0l; row < this->current_field_size.rows; row++)
-  {
-    for (index_t col = 0l; col < this->current_field_size.cols; col++)
-    {
-      Minefield::tile_t tile = this->getTile(row, col);
-
-      std::cout << std::setw(2) << (tile.is_mine ? -1 : tile.nr_surrounding_mines) << ' ';
-    }
-    std::cout << '\n';
-  }
-  std::cout.flush();
-#endif // defined(MW_DEBUG)
-
-  return true;
-}
-
 bool Minefield::activateFieldMain(index_t row, index_t col, std::vector<tile_with_position_t> &o_revealed_fields, bool &o_has_revealed_mine)
 {
   MW_SET_FUNC_SCOPE;
 
-  MW_LOG(trace) << "activating at row=" << row << " col=" << col;
-
-  //! TODO: remove
-  tile_position_t current_tile_pos{row, col};
-
-  // check source tile validity
-  if (!this->tilePositionValid(row, col))
-  {
-    MW_LOG_INVALID_TILE;
-
-    return false;
-  }
-
-  // get source tile
-  const tile_t &tile = this->getTile(current_tile_pos.row, current_tile_pos.col);
+  const tile_t &tile = this->getTile(row, col);
 
   o_has_revealed_mine = false;
 
   // initialize queue for field cascade
   o_revealed_fields.clear();
   std::queue<tile_position_t> field_queue;
-  if (tile.is_revealed && this->checkMineCountSatisfied(current_tile_pos.row, current_tile_pos.col))
+  if (tile.is_revealed && this->checkMineCountSatisfied(row, col))
   {
     // tile is revealed and is surrounded by as many flagged fields as there are mines around it
 
-    index_t above = current_tile_pos.row - 1l,
-           below = current_tile_pos.row + 1l,
-           left = current_tile_pos.col - 1l,
-           right = current_tile_pos.col + 1l;
+    index_t \
+      above = row - 1l,
+      below = row + 1l,
+      left  = col - 1l,
+      right = col + 1l;
 
     field_queue.push(tile_position_t{above, left});
-    field_queue.push(tile_position_t{above, current_tile_pos.col});
+    field_queue.push(tile_position_t{above, col});
     field_queue.push(tile_position_t{above, right});
-    field_queue.push(tile_position_t{current_tile_pos.row, left});
-    field_queue.push(tile_position_t{current_tile_pos.row, right});
+    field_queue.push(tile_position_t{row,   left});
+    field_queue.push(tile_position_t{row,   right});
     field_queue.push(tile_position_t{below, left});
-    field_queue.push(tile_position_t{below, current_tile_pos.col});
+    field_queue.push(tile_position_t{below, col});
     field_queue.push(tile_position_t{below, right});
   }
   else if (!tile.is_revealed && !tile.is_flagged)
   {
     // tile is not yet revealed
 
-    field_queue.push(current_tile_pos);
+    field_queue.push(tile_position_t{row, col});
   }
   else
   {
@@ -356,8 +323,8 @@ bool Minefield::activateFieldMain(index_t row, index_t col, std::vector<tile_wit
 
     MW_LOG(warning) << "can not activate field";
     MW_LOG(debug) << "is revealed: "  << tile.is_revealed
-                  << "; is flagged: " << tile.is_flagged
-                  << "; bomb count satisfied: " << this->checkMineCountSatisfied(current_tile_pos.row, current_tile_pos.col);
+                  << " is flagged: " << tile.is_flagged
+                  << " bomb count satisfied: " << this->checkMineCountSatisfied(row, col);
 
     return true;
   }
@@ -369,7 +336,7 @@ bool Minefield::activateFieldMain(index_t row, index_t col, std::vector<tile_wit
     tile_position_t current_tile_pos = std::move(field_queue.front());
     field_queue.pop();
 
-    if (!this->tilePositionValid(row, col))
+    if (!this->tilePositionValid(current_tile_pos.row, current_tile_pos.col))
     {
       // field does not exist
       continue;
@@ -545,7 +512,7 @@ bool Minefield::checkMineCountSatisfied(index_t row, index_t col)
 
   for (const tile_position_t &current_tile_pos : surrounding_tiles)
   {
-    if (!this->tilePositionValid(row, col)) continue;
+    if (!this->tilePositionValid(current_tile_pos.row, current_tile_pos.col)) continue;
     const tile_t &current_tile = this->getTile(current_tile_pos.row, current_tile_pos.col);
 
     if (/*current_tile.is_mine &&*/ current_tile.is_flagged)
