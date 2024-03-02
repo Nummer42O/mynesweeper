@@ -16,7 +16,7 @@ NoMovesLeftDialog::NoMovesLeftDialog(Gtk::Window &parent):
 
   content_area->show_all();
 
-  this->add_button(Gtk::Stock::YES, Gtk::RESPONSE_YES);
+  this->add_button(Gtk::Stock::YES, Gtk::RESPONSE_YES)->set_sensitive(false); //TODO: remove this set_sensitive call
   this->add_button(Gtk::Stock::NO,  Gtk::RESPONSE_NO);
   this->add_button("_Restart",      this->RESPONSE_RESTART);
 }
