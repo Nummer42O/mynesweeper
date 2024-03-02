@@ -21,6 +21,12 @@ const std::array<Minefield::tile_offset_t, 8ul> Minefield::offsets = {{
 }};
 
 
+inline bool operator==(const Minefield::tile_position_t &left, const Minefield::tile_position_t &right)
+{
+  return left.row == right.row && left.col == right.col;
+}
+
+
 /* #region minefield generation */
 
 Minefield::Minefield(index_t rows, index_t cols) : current_field_size{rows, cols}
@@ -592,7 +598,10 @@ Minefield::tile_t &Minefield::getTile(index_t row, index_t col, bool &o_is_valid
 {
   MW_SET_FUNC_SCOPE;
 
-  o_is_valid = (row < this->current_field_size.rows && col < this->current_field_size.cols);
+  o_is_valid = (
+    row >= 0l && row < this->current_field_size.rows &&
+    col >= 0l && col < this->current_field_size.cols
+  );
 
   if (!o_is_valid)
   {

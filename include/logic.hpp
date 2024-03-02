@@ -33,17 +33,26 @@ public:
 private:
   typedef struct
   {
-    bool is_flagged = false;
-    bool is_revealed = false;
-
+    // semi constant
     bool is_mine = false;
-    uint8_t nr_surrounding_mines = 0;
+    uint8_t nr_surrounding_mines = 0u;
+
+    // toggleable
+    bool \
+      is_flagged  = false,
+      is_revealed = false;
+
+    // runtime
+    uint8_t \
+      nr_surrounding_flags      = 8u,
+      nr_surrounding_untouched  = 8u;
   } tile_t;
 
   typedef struct
   {
     index_t row, col;
   } tile_position_t;
+  friend inline bool operator==(const tile_position_t &left, const tile_position_t &right);
 
   typedef struct
   {
