@@ -256,33 +256,31 @@ private:
   index_t calculateNrOfMines();
 
   /**
-   * @brief Get the field index from a tile position.
+   * @brief Check if the given position is inside the field boundaries.
+   *
+   * @param row row / y coordinate
+   * @param col column / x coordinate
+   *
+   * @return true if row/col are in bounds, false otherwise
+   */
+  inline bool tilePositionValid(
+    index_t row,
+    index_t col
+  );
+
+  /**
+   * @brief Get the tile at the specified position.
    *
    * @note No range checks are performed.
    *
    * @param row row / y coordinate
    * @param col column / x coordinate
    *
-   * @returns field vector index
-   */
-  inline index_t getTileIndex(
-    index_t row,
-    index_t col
-  );
-
-  /**
-   * @brief Attempt to get the tile at the specified position.
-   *
-   * @param row row / y coordinate
-   * @param col column / x coordinate
-   * @param o_is_valid true if the position is valid, false otherwise
-   *
    * @returns the selected tile
    */
-  tile_t &getTile(
+  inline tile_t &getTile(
     index_t row,
-    index_t col,
-    bool &o_is_valid
+    index_t col
   );
 
   /* #endregion */
