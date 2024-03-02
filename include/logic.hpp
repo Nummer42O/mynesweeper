@@ -60,6 +60,8 @@ private:
     int64_t rows, cols;
   } tile_offset_t;
 
+  typedef void (*for_surrounding_tiles_callback_t)(tile_t &);
+
 public:
   /* #region minefield generation */
 
@@ -206,6 +208,21 @@ private:
     index_t col,
     std::vector<tile_with_position_t> &o_revealed_fields,
     bool &o_has_revealed_mine
+  );
+
+  /**
+   * @brief Give all valid surrounding tiles to callback.
+   *
+   * @note No range checks are performed on the source tile.
+   *
+   * @param row row / y coordinate of source tile
+   * @param col column / x coordinate of source tile
+   * @param callback function to apply to surrounding tiles
+   */
+  void forSurroundingMines(
+    index_t row,
+    index_t col,
+    for_surrounding_tiles_callback_t callback
   );
 
   /* #endregion */

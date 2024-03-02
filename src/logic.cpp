@@ -374,10 +374,11 @@ void Minefield::revealTileInternal(index_t row, index_t col, std::vector<tile_wi
     // if we hit an "empty" (no adjacent mines) reveal, add all adjacent fields to the queue
     if (current_tile.nr_surrounding_mines == 0)
     {
-      index_t above = current_tile_pos.row - 1l,
-             below = current_tile_pos.row + 1l,
-             left = current_tile_pos.col - 1l,
-             right = current_tile_pos.col + 1l;
+      index_t \
+        above = current_tile_pos.row - 1l,
+        below = current_tile_pos.row + 1l,
+        left  = current_tile_pos.col - 1l,
+        right = current_tile_pos.col + 1l;
 
       field_queue.push(tile_position_t{above, left});
       field_queue.push(tile_position_t{above, current_tile_pos.col});
@@ -391,6 +392,20 @@ void Minefield::revealTileInternal(index_t row, index_t col, std::vector<tile_wi
   } while (!field_queue.empty());
 
   return;
+}
+
+void Minefield::forSurroundingMines(index_t row, index_t col, for_surrounding_tiles_callback_t callback)
+{
+  for (const tile_offset_t& offset: this->offsets)
+  {
+    const index_t \
+      current_row = row + offset.rows,
+      current_col = col + offset.cols;
+
+    if (!this->tilePositionValid(current_row, current_col)) continue;
+
+    callback(this->getTile(current_row, current_col));
+  }
 }
 
 /* #endregion */
