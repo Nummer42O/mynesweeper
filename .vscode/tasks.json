@@ -100,7 +100,8 @@
         "cwd": "${workspaceFolder}/build"
       },
       "command": [
-        "make", "-j"
+        "make", "-j",
+        "|", "tee", "mynesweeper_build.log"
       ],
 
       "presentation": {
