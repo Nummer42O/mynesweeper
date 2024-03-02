@@ -85,7 +85,7 @@ void Application::revealCallback(index_t row, index_t col)
 
   std::vector<Minefield::tile_with_position_t> cascade;
   bool has_hit_mine;
-  if (!this->minefield->activateField(row, col, cascade, has_hit_mine)) return;
+  if (!this->minefield->revealTile(row, col, cascade, has_hit_mine)) return;
 
   if (has_hit_mine)
   {
@@ -99,7 +99,7 @@ void Application::revealCallback(index_t row, index_t col)
     {
       for (const Minefield::tile_with_position_t &tile : cascade)
       {
-        this->minefield->undoFieldActivation(tile.row, tile.col);
+        this->minefield->undoTileReveal(tile.row, tile.col);
         this->window->undoFieldReveal(tile.row, tile.col);
       }
     }
@@ -120,7 +120,7 @@ void Application::flagCallback(index_t row, index_t col)
   MW_SET_FUNC_SCOPE;
 
   bool is_flagged;
-  if (!this->minefield->toggleFieldFlag(row, col, is_flagged)) return;
+  if (!this->minefield->toggleTileFlag(row, col, is_flagged)) return;
 
   this->window->setFieldFlag(row, col, is_flagged);
 
@@ -202,7 +202,7 @@ void Application::checkGameStatus()
     if (response == NoMovesLeftDialog::ReturnType::YES)
     {
       Minefield::cascade_t cascade;
-      this->minefield->revealFieldsForUser(cascade);
+      this->minefield->revealTilesForUser(cascade);
 
       for (const Minefield::tile_with_position_t &tile: cascade);
     }

@@ -103,7 +103,7 @@ public:
    *
    * @returns true if the position was valid, false otherwise
    */
-  bool activateField(
+  bool revealTile(
     index_t row,
     index_t col,
     cascade_t &o_revealed_fields,
@@ -118,7 +118,7 @@ public:
    *
    * @returns true if the position was valid, false otherwise
    */
-  bool undoFieldActivation(
+  bool undoTileReveal(
     index_t row,
     index_t col
   );
@@ -132,7 +132,7 @@ public:
    *
    * @returns true if o_is_flagged is valid, false otherwise
    */
-  bool toggleFieldFlag(
+  bool toggleTileFlag(
     index_t row,
     index_t col,
     bool &o_is_flagged
@@ -143,7 +143,7 @@ public:
    *
    * @param o_revealed_fields vector of tiles that got revealed in cascade
    */
-  void revealFieldsForUser(
+  void revealTilesForUser(
     cascade_t &o_revealed_fields
   );
 
@@ -200,10 +200,8 @@ private:
    * @param col column / x coordinate
    * @param o_revealed_fields vector of tiles that got revealed in cascade
    * @param o_has_revealed_mine wether @ref `o_revealed_fields` contains a mine or not
-   *
-   * @returns true if the position was valid, false otherwise
    */
-  bool activateFieldMain(
+  void revealTileInternal(
     index_t row,
     index_t col,
     std::vector<tile_with_position_t> &o_revealed_fields,

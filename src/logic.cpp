@@ -187,7 +187,7 @@ void Minefield::initFields(index_t row, index_t col)
 /* #endregion */
 /* #region field manipulation */
 
-bool Minefield::activateField(index_t row, index_t col, cascade_t &o_revealed_fields, bool & o_has_revealed_mine)
+bool Minefield::revealTile(index_t row, index_t col, cascade_t &o_revealed_fields, bool & o_has_revealed_mine)
 {
   MW_SET_FUNC_SCOPE;
 
@@ -220,10 +220,12 @@ bool Minefield::activateField(index_t row, index_t col, cascade_t &o_revealed_fi
 #   endif // defined(MW_DEBUG)
   }
 
-  return this->activateFieldMain(row, col, o_revealed_fields, o_has_revealed_mine);
+  this->revealTileInternal(row, col, o_revealed_fields, o_has_revealed_mine);
+
+  return true;
 }
 
-bool Minefield::undoFieldActivation(index_t row, index_t col)
+bool Minefield::undoTileReveal(index_t row, index_t col)
 {
   MW_SET_FUNC_SCOPE;
 
@@ -242,7 +244,7 @@ bool Minefield::undoFieldActivation(index_t row, index_t col)
   return true;
 }
 
-bool Minefield::toggleFieldFlag(index_t row, index_t col, bool &o_is_flagged)
+bool Minefield::toggleTileFlag(index_t row, index_t col, bool &o_is_flagged)
 {
   MW_SET_FUNC_SCOPE;
 
@@ -272,7 +274,7 @@ bool Minefield::toggleFieldFlag(index_t row, index_t col, bool &o_is_flagged)
   return true;
 }
 
-void Minefield::revealFieldsForUser(cascade_t &o_revealed_fields)
+void Minefield::revealTilesForUser(cascade_t &o_revealed_fields)
 {
   /**
    * 1. generate list of all unrevealed tiles adjacent to revealed ones
@@ -281,7 +283,7 @@ void Minefield::revealFieldsForUser(cascade_t &o_revealed_fields)
    */
 }
 
-bool Minefield::activateFieldMain(index_t row, index_t col, std::vector<tile_with_position_t> &o_revealed_fields, bool &o_has_revealed_mine)
+void Minefield::revealTileInternal(index_t row, index_t col, std::vector<tile_with_position_t> &o_revealed_fields, bool &o_has_revealed_mine)
 {
   MW_SET_FUNC_SCOPE;
 
@@ -326,7 +328,7 @@ bool Minefield::activateFieldMain(index_t row, index_t col, std::vector<tile_wit
                   << " is flagged: " << tile.is_flagged
                   << " bomb count satisfied: " << this->checkMineCountSatisfied(row, col);
 
-    return true;
+    return;
   }
 
   // by default we don't expect to hit a mine, if we hit one this will be overwritten
@@ -388,7 +390,7 @@ bool Minefield::activateFieldMain(index_t row, index_t col, std::vector<tile_wit
     }
   } while (!field_queue.empty());
 
-  return true;
+  return;
 }
 
 /* #endregion */
