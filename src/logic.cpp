@@ -221,20 +221,6 @@ bool Minefield::revealTile(index_t row, index_t col, cascade_t &o_revealed_field
   {
     this->initFields(row, col);
     this->field_inizialized = true;
-
-#   ifdef MW_DEBUG
-    for (index_t row = 0l; row < this->current_field_size.rows; row++)
-    {
-      for (index_t col = 0l; col < this->current_field_size.cols; col++)
-      {
-        Minefield::tile_t tile = this->getTile(row, col);
-
-        std::cout << std::setw(2) << (tile.is_mine ? -1 : tile.nr_surrounding_mines) << ' ';
-      }
-      std::cout << '\n';
-    }
-    std::cout.flush();
-#   endif // defined(MW_DEBUG)
   }
 
   this->revealTileInternal(row, col, o_revealed_fields, o_has_revealed_mine);
@@ -543,10 +529,31 @@ bool Minefield::checkHasAvailableMoves()
 /* #endregion */
 /* #region getters */
 
-inline const index_t &Minefield::getNrMines()
+const index_t &Minefield::getNrMines()
 {
   return this->nr_of_mines;
 }
+
+#ifdef MW_DEBUG
+void Minefield::printField()
+{
+  if (!this->field_inizialized) return;
+
+  std::stringstream field;
+  for (index_t row = 0l; row < this->current_field_size.rows; row++)
+  {
+    for (index_t col = 0l; col < this->current_field_size.cols; col++)
+    {
+      Minefield::tile_t tile = this->getTile(row, col);
+
+      field << std::setw(2) << (tile.is_mine ? -1 : tile.nr_surrounding_mines) << ' ';
+    }
+    field << '\n';
+  }
+
+  MW_LOG(info) << "field:\n" << field.str();
+}
+#endif // defined(MW_DEBUG)
 
 inline index_t Minefield::calculateNrOfMines()
 {

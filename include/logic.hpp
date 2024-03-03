@@ -175,7 +175,11 @@ public:
    *
    * @returns nr of mines
    */
-  inline const index_t &getNrMines();
+  const index_t &getNrMines();
+
+# ifdef MW_DEBUG
+  void printField();
+# endif //defined(MW_DEBUG)
 
   /* #endregion */
 
