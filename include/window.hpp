@@ -34,8 +34,14 @@ public:
    * @param callback the new callback
    */
   void bindRestartButtonCallback(
-    restart_button_callback_t callback
+    const restart_button_callback_t &callback
   );
+
+# ifdef MW_DEBUG
+  void setTileDebugCallback(
+    const sigc::slot<std::string, index_t, index_t> &callback
+  );
+# endif //!defined(MW_DEBUG)
 
   /**
    * @brief Reveal a tile as a number (1-8), empty (0) or bomb (-1).
@@ -138,4 +144,8 @@ private:
 
   Tile::callback_t shared_tile_clicked_callback;
   sigc::connection restart_button_callback_connection;
+
+# ifdef MW_DEBUG
+  sigc::slot<std::string, index_t, index_t> tile_information_callback;
+# endif //!defined(MW_DEBUG)
 };

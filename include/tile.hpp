@@ -58,6 +58,7 @@ public:
    */
   void reset();
 
+# ifdef MW_DEBUG
   /**
    * @brief Set the position associated with this tile.
    *
@@ -65,6 +66,9 @@ public:
    * @param col column / x coordinate
    */
   void setPosition(index_t row, index_t col);
+
+  void setInformationCallback(const sigc::slot<std::string, index_t, index_t> &callback);
+# endif //!defined(MW_DEBUG)
 
 private:
   /**
@@ -102,8 +106,11 @@ private:
   Gtk::Image image;
   callback_t click_callback;
 
-  index_t row, col;
   TileState state = TileState::UNTOUCHED;
 
   state_sprites_t flagged_sprites, untouched_sprites;
+
+# ifdef MW_DEBUG
+  index_t row, col;
+# endif //defined(MW_DEBUG)
 };

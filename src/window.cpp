@@ -59,7 +59,7 @@ Window::Window(Tile::callback_t tile_clicked_callback):
   controls_box->pack_end(this->restart_widget, Gtk::PACK_SHRINK);
 }
 
-void Window::bindRestartButtonCallback(restart_button_callback_t callback)
+void Window::bindRestartButtonCallback(const restart_button_callback_t &callback)
 {
   MW_SET_FUNC_SCOPE;
 
@@ -71,6 +71,14 @@ void Window::bindRestartButtonCallback(restart_button_callback_t callback)
   }
   restart_button_callback_connection = std::move(this->restart_widget.signal_clicked().connect(callback, true));
 }
+
+
+#ifdef MW_DEBUG
+void Window::setTileDebugCallback(const sigc::slot<std::string, index_t, index_t> &callback)
+{
+  this->tile_information_callback = callback;
+}
+#endif //!defined(MW_DEBUG)
 
 void Window::revealField(index_t row, index_t col, int as)
 {
@@ -124,6 +132,7 @@ void Window::generateMinefield(index_t rows, index_t cols, index_t nr_bombs)
     for (index_t idx = old_tile_count; idx < new_tile_count; idx++)
     {
       Tile *new_tile = Gtk::make_managed<Tile>(this->shared_tile_clicked_callback, this->flagged_sprites, this->untouched_sprites);
+      new_tile->setInformationCallback(this->tile_information_callback);
       this->field_widget.add(*new_tile);
     }
   }

@@ -178,7 +178,7 @@ public:
   const index_t &getNrMines();
 
 # ifdef MW_DEBUG
-  void printField();
+  std::string getTileString(index_t row, index_t col);
 # endif //defined(MW_DEBUG)
 
   /* #endregion */
@@ -280,7 +280,7 @@ private:
 
   index_t field_size;
   std::vector<tile_t> field;
-  bool field_inizialized;
+  bool field_initialized = false;
 
   static tile_t default_tile;
   static const std::array<tile_offset_t, 8ul> offsets;

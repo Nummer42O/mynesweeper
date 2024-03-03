@@ -57,20 +57,29 @@ void Tile::reset()
   this->state = TileState::UNTOUCHED;
 }
 
+# ifdef MW_DEBUG
 void Tile::setPosition(index_t row, index_t col)
 {
-  MW_SET_FUNC_SCOPE;
-
   this->row = row;
   this->col = col;
 
-# ifdef MW_DEBUG
-  std::stringstream tooltip_text_stream;
-  tooltip_text_stream << '(' << std::setw(2) << row << '|' << std::setw(2) << col << ')';
-
-  this->set_tooltip_text(tooltip_text_stream.str());
-# endif // defined(MW_DEBUG)
+  this->set_has_tooltip();
 }
+
+void Tile::setInformationCallback(const sigc::slot<std::string, index_t, index_t> &callback)
+{
+  this->signal_query_tooltip().connect(
+    [&](int, int, bool, const Glib::RefPtr<Gtk::Tooltip> &tooltip)
+    {
+      std::stringstream text;
+      text << '(' << std::setw(2) << row << " | " << std::setw(2) << col << ")\n" << callback(this->row, this->col);
+      tooltip->set_text(text.str());
+
+      return true;
+    }
+  );
+}
+# endif // defined(MW_DEBUG)
 
 bool Tile::enterNotifyCallback(GdkEventCrossing *)
 {

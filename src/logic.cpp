@@ -72,7 +72,7 @@ Minefield::Minefield(index_t rows, index_t cols):
 
   this->nr_of_mines = this->calculateNrOfMines();
 
-  this->field_inizialized = false;
+  this->field_initialized = false;
 }
 
 void Minefield::resize(index_t rows, index_t cols)
@@ -88,7 +88,7 @@ void Minefield::resize(index_t rows, index_t cols)
 
   this->nr_of_mines = this->calculateNrOfMines();
 
-  this->field_inizialized = false;
+  this->field_initialized = false;
 }
 
 void Minefield::reset()
@@ -97,7 +97,7 @@ void Minefield::reset()
 
   MW_LOG(trace) << "reset";
 
-  this->field_inizialized = false;
+  this->field_initialized = false;
 }
 
 void Minefield::initFields(index_t row, index_t col)
@@ -238,10 +238,10 @@ bool Minefield::revealTile(index_t row, index_t col, cascade_t &o_revealed_field
     return false;
   }
 
-  if (!this->field_inizialized)
+  if (!this->field_initialized)
   {
     this->initFields(row, col);
-    this->field_inizialized = true;
+    this->field_initialized = true;
   }
 
   this->revealTileInternal(row, col, o_revealed_fields, o_has_revealed_mine);
@@ -531,29 +531,21 @@ const index_t &Minefield::getNrMines()
 }
 
 #ifdef MW_DEBUG
-void Minefield::printField()
+std::string Minefield::getTileString(index_t row, index_t col)
 {
   MW_SET_FUNC_SCOPE;
 
-  if (!this->field_inizialized) return;
+  if (!this->field_initialized) return "";
+  const tile_t &tile = this->getTile(row, col);
 
-  std::stringstream field;
-  for (index_t row = 0l; row < this->current_field_size.rows; row++)
-  {
-    for (index_t col = 0l; col < this->current_field_size.cols; col++)
-    {
-      Minefield::tile_t tile = this->getTile(row, col);
+  std::stringstream text;
+  text << \
+    "type: " << (tile.is_mine ? "mine" : std::to_string(tile.nr_surrounding_mines)) << "\n"
+    "state: " << (tile.is_flagged ? "flagged" : (tile.is_revealed ? "revealed" : "untouched")) << "\n"
+    "adjacent flags: " << (int)tile.nr_surrounding_flags << "\n"
+    "adjacent untouched: " << (int)tile.nr_surrounding_untouched;
 
-      field << std::setw(2) << (tile.is_mine ? -1 : tile.nr_surrounding_mines) << ' ';
-    }
-    field << '\n';
-  }
-
-  try {
-    MW_LOG(info) << "field:\n" << field.str();
-  } catch (std::exception &exc) {
-    MW_LOG(error) << "Cannot print field: " << exc.what();
-  }
+  return text.str();
 }
 #endif // defined(MW_DEBUG)
 

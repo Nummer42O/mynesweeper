@@ -28,20 +28,6 @@ void Application::on_activate()
     sigc::mem_fun0(*this, &Application::startGame)
   );
 
-# ifdef MW_DEBUG
-  this->window->signal_key_release_event().connect(
-    [&](GdkEventKey *event_key) -> bool
-    {
-      if (event_key->keyval == GDK_KEY_x)
-      {
-        this->minefield->printField();
-      }
-
-      return false;
-    }
-  );
-# endif //defined(DEBUG)
-
   this->new_game_dialog = std::make_shared<NewGameDialog>(*(this->window));
   this->no_moves_left_dialog = std::make_shared<NoMovesLeftDialog>(*(this->window));
 
@@ -164,6 +150,12 @@ void Application::startGame()
       this->newGame(NewGameDialog::Type::START);
     }
   );
+
+# ifdef MW_DEBUG
+  this->window->setTileDebugCallback(
+    sigc::mem_fun2(*(this->minefield), &Minefield::getTileString)
+  );
+# endif //defined(DEBUG)
 }
 
 bool Application::newGame(NewGameDialog::Type type)
