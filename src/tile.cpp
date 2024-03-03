@@ -57,15 +57,17 @@ void Tile::reset()
   this->state = TileState::UNTOUCHED;
 }
 
-# ifdef MW_DEBUG
 void Tile::setPosition(index_t row, index_t col)
 {
   this->row = row;
   this->col = col;
 
+# ifdef MW_DEBUG
   this->set_has_tooltip();
+# endif //defined(MW_DEBUG)
 }
 
+# ifdef MW_DEBUG
 void Tile::setInformationCallback(const sigc::slot<std::string, index_t, index_t> &callback)
 {
   this->signal_query_tooltip().connect(

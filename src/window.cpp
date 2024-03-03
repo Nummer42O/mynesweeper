@@ -132,8 +132,11 @@ void Window::generateMinefield(index_t rows, index_t cols, index_t nr_bombs)
     for (index_t idx = old_tile_count; idx < new_tile_count; idx++)
     {
       Tile *new_tile = Gtk::make_managed<Tile>(this->shared_tile_clicked_callback, this->flagged_sprites, this->untouched_sprites);
-      new_tile->setInformationCallback(this->tile_information_callback);
       this->field_widget.add(*new_tile);
+
+#     ifdef MW_DEBUG
+      new_tile->setInformationCallback(this->tile_information_callback);
+#     endif //defined(MW_DEBUG)
     }
   }
   else
