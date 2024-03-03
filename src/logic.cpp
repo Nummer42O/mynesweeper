@@ -28,6 +28,19 @@ const std::array<Minefield::tile_offset_t, 4ul> Minefield::directions = {{
 }};
 
 
+std::ostream &operator<<(std::ostream &stream, const Minefield::tile_t &tile)
+{
+  stream << std::boolalpha << "{"
+    "is mine: " << tile.is_mine << " "
+    "nr surrounding mines: " << (int)tile.nr_surrounding_mines << "  "
+    "is flagged: " << tile.is_flagged << " "
+    "is revealed: " << tile.is_revealed << " "
+    "nr surrounding flags: " << (int)tile.nr_surrounding_flags << " "
+    "nr surrounding untouched: " << (int)tile.nr_surrounding_untouched << '}';
+
+  return stream;
+}
+
 inline bool operator==(const Minefield::tile_position_t &left, const Minefield::tile_position_t &right)
 {
   return left.row == right.row && left.col == right.col;
@@ -242,7 +255,7 @@ bool Minefield::undoTileReveal(index_t row, index_t col)
   tile.is_revealed = false;
   this->forSurroundingMines(
     row, col,
-    [](tile_t &surrounding_tile)
+    [](tile_t &surrounding_tile, const void *)
     {
       surrounding_tile.nr_surrounding_untouched++;
     }
@@ -271,28 +284,17 @@ bool Minefield::toggleTileFlag(index_t row, index_t col, bool &o_is_flagged)
   tile.is_flagged = !tile.is_flagged;
   o_is_flagged = (tile.is_flagged);
 
-  //! NOTE: not beautiful but better then dealing with capturing lambda expressions
-  //! TODO: maybe look into how to make this.. better
-  if (o_is_flagged)
-  {
-    this->forSurroundingMines(
-      row, col,
-      [](tile_t &surrounding_tile)
-      {
-        surrounding_tile.nr_surrounding_flags++;
-      }
-    );
-  }
-  else
-  {
-    this->forSurroundingMines(
-      row, col,
-      [](tile_t &surrounding_tile)
-      {
-        surrounding_tile.nr_surrounding_flags--;
-      }
-    );
-  }
+
+  this->forSurroundingMines(
+    row, col,
+    [](tile_t &surrounding_tile, const void *user_data)
+    {
+      //! NOTE: (int)false = 0 -> offset = -1; (int)true = 1 -> 1
+      const int8_t offset = 2 * (*static_cast<const int8_t *>(user_data)) - 1;
+      surrounding_tile.nr_surrounding_flags += offset;
+    },
+    &o_is_flagged
+  );
 
   return true;
 }
@@ -317,7 +319,7 @@ void Minefield::revealTileInternal(index_t row, index_t col, std::vector<tile_wi
   // initialize queue for field cascade
   o_revealed_fields.clear();
   std::queue<tile_position_t> field_queue;
-  if (tile.is_revealed && this->checkMineCountSatisfied(row, col))
+  if (tile.is_revealed && tile.nr_surrounding_mines == tile.nr_surrounding_flags)
   {
     // tile is revealed and is surrounded by as many flagged fields as there are mines around it
 
@@ -347,9 +349,7 @@ void Minefield::revealTileInternal(index_t row, index_t col, std::vector<tile_wi
     // not enough adjacent flagged fields or field itself is flagged
 
     MW_LOG(warning) << "can not activate field";
-    MW_LOG(debug) << "is revealed: "  << tile.is_revealed
-                  << " is flagged: " << tile.is_flagged
-                  << " bomb count satisfied: " << this->checkMineCountSatisfied(row, col);
+    MW_LOG(debug) << tile;
 
     return;
   }
@@ -380,7 +380,7 @@ void Minefield::revealTileInternal(index_t row, index_t col, std::vector<tile_wi
     current_tile.is_revealed = true;
     this->forSurroundingMines(
       current_tile_pos.row, current_tile_pos.col,
-      [](tile_t &surrounding_tile)
+      [](tile_t &surrounding_tile, const void *)
       {
         surrounding_tile.nr_surrounding_untouched--;
       }
@@ -424,7 +424,7 @@ void Minefield::revealTileInternal(index_t row, index_t col, std::vector<tile_wi
   return;
 }
 
-void Minefield::forSurroundingMines(index_t row, index_t col, for_surrounding_tiles_callback_t callback)
+void Minefield::forSurroundingMines(index_t row, index_t col, for_surrounding_tiles_callback_t callback, const void *user_data)
 {
   for (const tile_offset_t& offset: this->offsets)
   {
@@ -434,7 +434,7 @@ void Minefield::forSurroundingMines(index_t row, index_t col, for_surrounding_ti
 
     if (!this->tilePositionValid(current_row, current_col)) continue;
 
-    callback(this->getTile(current_row, current_col));
+    callback(this->getTile(current_row, current_col), user_data);
   }
 }
 
@@ -444,6 +444,8 @@ void Minefield::forSurroundingMines(index_t row, index_t col, for_surrounding_ti
 bool Minefield::checkGameWon()
 {
   MW_SET_FUNC_SCOPE;
+
+  //! TODO: CONTINUE HERE (use the newly introduces runtime variables on the tiles)
 
   index_t
       revealed_tiles_count = 0l,
@@ -516,60 +518,15 @@ bool Minefield::checkHasAvailableMoves()
       if ((flagged_all_mines && surrounding_covered > 0) ||
           (!flagged_all_mines && surrounding_covered == (current_tile.nr_surrounding_mines - surrounding_flags)))
       {
-        MW_LOG(debug) << "row=" << row << "col=" << col << " has available moves";
+        MW_LOG(debug) <<  "row=" << row
+                      << " col=" << col
+                      << " has available moves";
         return true;
       }
     }
   }
 
   MW_LOG(warning) << "No more available moves.";
-
-  return false;
-}
-
-bool Minefield::checkMineCountSatisfied(index_t row, index_t col)
-{
-  MW_SET_FUNC_SCOPE;
-
-  if (!this->tilePositionValid(row, col))
-  {
-    MW_LOG_INVALID_TILE;
-
-    return false;
-  }
-  const tile_t &tile = this->getTile(row, col);
-
-  uint8_t mine_count = 0u;
-
-  //! TODO: maybe rewrite without loop - the array size won't change anyways
-  index_t above = row - 1l,
-         below = row + 1l,
-         left  = col - 1l,
-         right = col + 1l;
-  std::array<tile_position_t, 8ul> surrounding_tiles{
-      tile_position_t{above, left},
-      tile_position_t{above, col},
-      tile_position_t{above, right},
-      tile_position_t{row,   left},
-      tile_position_t{row,   right},
-      tile_position_t{below, left},
-      tile_position_t{below, col},
-      tile_position_t{below, right},
-  };
-
-  for (const tile_position_t &current_tile_pos : surrounding_tiles)
-  {
-    if (!this->tilePositionValid(current_tile_pos.row, current_tile_pos.col)) continue;
-    const tile_t &current_tile = this->getTile(current_tile_pos.row, current_tile_pos.col);
-
-    if (/*current_tile.is_mine &&*/ current_tile.is_flagged)
-    {
-      if (++mine_count == tile.nr_surrounding_mines)
-      {
-        return true;
-      }
-    }
-  }
 
   return false;
 }

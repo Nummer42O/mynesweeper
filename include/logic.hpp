@@ -47,6 +47,7 @@ private:
       nr_surrounding_flags      = 8u,
       nr_surrounding_untouched  = 8u;
   } tile_t;
+  friend std::ostream &operator<<(std::ostream &stream, const tile_t &tile);
 
   typedef struct
   {
@@ -60,7 +61,7 @@ private:
     int64_t rows, cols;
   } tile_offset_t;
 
-  typedef void (*for_surrounding_tiles_callback_t)(tile_t &);
+  typedef void (*for_surrounding_tiles_callback_t)(tile_t &, const void *);
 
 public:
   /* #region minefield generation */
@@ -218,29 +219,13 @@ private:
    * @param row row / y coordinate of source tile
    * @param col column / x coordinate of source tile
    * @param callback function to apply to surrounding tiles
+   * @param user_data data pointer to be reinterpreted by the callback
    */
   void forSurroundingMines(
     index_t row,
     index_t col,
-    for_surrounding_tiles_callback_t callback
-  );
-
-  /* #endregion */
-  /* #region status checks */
-
-  /**
-   * @brief Check wether all mines sourrnding the tile are flagged.
-   *
-   * @note It is not checked, wether this check itself makes sense or not.
-   *
-   * @param row row / y coordinate
-   * @param col column / x coordinate
-   *
-   * @returns true if the check succeded, false otherwise
-   */
-  bool checkMineCountSatisfied(
-    index_t row,
-    index_t col
+    for_surrounding_tiles_callback_t callback,
+    const void *user_data = nullptr
   );
 
   /* #endregion */
