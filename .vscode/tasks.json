@@ -13,7 +13,7 @@
         "rm",
           "--recursive",
           "--force",
-            "./*"
+          "./*"
       ],
 
       "presentation": {
@@ -39,10 +39,13 @@
         "cwd": "${workspaceFolder}/build"
       },
       "command": [
-        "cmake",
-          "-DCMAKE_BUILD_TYPE=Debug",
-          "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
-          ".."
+        "script",
+          "--quiet",
+          "--return",
+          "--append",
+          "--command",
+            "'cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..'",
+          "build$(date +%d%m%Y).log"
       ],
 
       "presentation": {
@@ -68,10 +71,13 @@
         "cwd": "${workspaceFolder}/build"
       },
       "command": [
-        "cmake",
-          "-DCMAKE_BUILD_TYPE=Release",
-          "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
-          ".."
+        "script",
+          "--quiet",
+          "--return",
+          "--append",
+          "--command",
+            "'cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..'",
+          "build$(date +%d%m%Y).log"
       ],
 
       "presentation": {
@@ -103,9 +109,10 @@
         "script",
           "--quiet",
           "--return",
+          "--append",
           "--command",
             "'make -j'",
-          "mynesweeper_build.log"
+          "build$(date +%d%m%Y).log"
       ],
 
       "presentation": {
@@ -131,7 +138,13 @@
         "cwd": "${workspaceFolder}/build"
       },
       "command": [
-        "sudo", "make", "install"
+        "script",
+          "--quiet",
+          "--return",
+          "--append",
+          "--command",
+            "'sudo make install'",
+          "build$(date +%d%m%Y).log"
       ],
 
       "presentation": {
