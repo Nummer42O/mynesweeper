@@ -34,7 +34,6 @@ void Application::on_activate()
     {
       if (event_key->keyval == GDK_KEY_x)
       {
-        std::cout << "printing" << std::endl;
         this->minefield->printField();
       }
 

@@ -112,7 +112,28 @@ void Minefield::initFields(index_t row, index_t col)
   std::uniform_int_distribution<size_t> random_direction_idx(0ul, 3ul);
 
   // reset field
-  std::fill(this->field.begin(), this->field.end(), tile_t());
+  index_t tile_position_idx = 0l;
+  std::generate(
+    this->field.begin(), this->field.end(),
+    [&]()
+    {
+      assert(tile_position_idx < this->field_size);
+
+      tile_t tile;
+      const index_t \
+        row = tile_position_idx / this->current_field_size.cols,
+        col = tile_position_idx % this->current_field_size.cols;
+      uint8_t untouched_tiles_correction = 0u;
+      if (row == 0l || row == this->current_field_size.rows - 1) untouched_tiles_correction += 3u;
+      if (col == 0l || col == this->current_field_size.cols - 1) untouched_tiles_correction += 3u;
+      if (untouched_tiles_correction == 6u) untouched_tiles_correction = 5u;
+      tile.nr_surrounding_untouched -= untouched_tiles_correction;
+
+      tile_position_idx++;
+
+      return tile;
+    }
+  );
 
   // generate initial patch
   std::set<tile_position_t> initial_patch = {{tile_position_t{row, col}}};
@@ -141,7 +162,7 @@ void Minefield::initFields(index_t row, index_t col)
   std::vector<tile_position_t> \
     possible_mine_positions(this->field_size - initial_patch.size()),
     mine_positions;
-  index_t tile_position_index = 0l;
+  tile_position_idx = 0l;
   std::generate(
     possible_mine_positions.begin(), possible_mine_positions.end(),
     [&]()
@@ -149,13 +170,13 @@ void Minefield::initFields(index_t row, index_t col)
       tile_position_t tile_position;
       do
       {
-        assert(tile_position_index < this->field_size);
+        assert(tile_position_idx < this->field_size);
 
         tile_position = tile_position_t{
-          /*rows = */ tile_position_index / this->current_field_size.cols,
-          /*cols = */ tile_position_index % this->current_field_size.cols
+          /*rows = */ tile_position_idx / this->current_field_size.cols,
+          /*cols = */ tile_position_idx % this->current_field_size.cols
         };
-        tile_position_index++;
+        tile_position_idx++;
       }
       while (initial_patch.contains(tile_position));
 
@@ -285,6 +306,7 @@ bool Minefield::toggleTileFlag(index_t row, index_t col, bool &o_is_flagged)
       //! NOTE: (int)false = 0 -> offset = -1; (int)true = 1 -> 1
       const int8_t offset = 2 * (*static_cast<const int8_t *>(user_data)) - 1;
       surrounding_tile.nr_surrounding_flags += offset;
+      surrounding_tile.nr_surrounding_untouched -= offset;
     },
     &o_is_flagged
   );
@@ -442,9 +464,9 @@ bool Minefield::checkGameWon()
 
   //! TODO: CONTINUE HERE (use the newly introduces runtime variables on the tiles)
 
-  index_t
-      revealed_tiles_count = 0l,
-      correctly_flagged_mines_count = 0l;
+  index_t \
+    revealed_tiles_count = 0l,
+    correctly_flagged_mines_count = 0l;
   const index_t non_mine_tiles_count = this->field_size - this->nr_of_mines;
 
   for (const tile_t &current_tile : this->field)
@@ -466,58 +488,32 @@ bool Minefield::checkHasAvailableMoves()
 {
   MW_SET_FUNC_SCOPE
 
-  for (index_t row = 0l; row < this->current_field_size.rows; row++)
+  // for (const tile_t &tile: this->field)
+  for (index_t idx = 0l; idx < this->field_size; idx++)
   {
-    for (index_t col = 0l; col < this->current_field_size.cols; col++)
+    const tile_t &tile = this->field[idx];
+
+    if (
+      tile.is_flagged   ||
+      !tile.is_revealed ||
+      (tile.is_revealed && tile.nr_surrounding_mines == 0)
+    ) continue;
+
+    MW_LOG(debug) << tile;
+
+    /**
+     * NOTE: a tile has moves available, when...
+     *  ...a satisfied mine has still non-revealed fields
+     *  ...a non-satisfied mine has the same number unrevealed adjacent tiles as remaining unflagged adjacent mines
+    */
+    const bool tile_satisfied = (tile.nr_surrounding_flags == tile.nr_surrounding_mines);
+    if (
+      (tile_satisfied && tile.nr_surrounding_untouched > 0) ||
+      (!tile_satisfied && tile.nr_surrounding_untouched == (tile.nr_surrounding_mines - tile.nr_surrounding_flags))
+    )
     {
-      tile_t current_tile = this->getTile(row, col);
-
-      if (!current_tile.is_revealed || (current_tile.is_revealed && current_tile.nr_surrounding_mines == 0))
-        continue;
-
-      uint8_t surrounding_flags = 0u,
-              surrounding_covered = 0u;
-      {
-        index_t above = row - 1l,
-               below = row + 1l,
-               left = col - 1l,
-               right = col + 1l;
-        std::array<tile_position_t, 8ul> surrounding_tiles{
-            tile_position_t{above, left},
-            tile_position_t{above, col},
-            tile_position_t{above, right},
-            tile_position_t{row, left},
-            tile_position_t{row, right},
-            tile_position_t{below, left},
-            tile_position_t{below, col},
-            tile_position_t{below, right},
-        };
-
-        for (const tile_position_t &current_tile_pos : surrounding_tiles)
-        {
-          if (!this->tilePositionValid(current_tile_pos.row, current_tile_pos.col)) continue;
-          const tile_t &surrounding_tile = this->getTile(current_tile_pos.row, current_tile_pos.col);
-
-          if (surrounding_tile.is_flagged)
-          {
-            surrounding_flags++;
-          }
-          else if (!surrounding_tile.is_revealed)
-          {
-            surrounding_covered++;
-          }
-        }
-      }
-
-      const bool flagged_all_mines = (surrounding_flags == current_tile.nr_surrounding_mines);
-      if ((flagged_all_mines && surrounding_covered > 0) ||
-          (!flagged_all_mines && surrounding_covered == (current_tile.nr_surrounding_mines - surrounding_flags)))
-      {
-        MW_LOG(debug) <<  "row=" << row
-                      << " col=" << col
-                      << " has available moves";
-        return true;
-      }
+      MW_LOG(debug) << "moves available @ row=" << idx / this->current_field_size.cols << " cols=" << idx % this->current_field_size.cols;
+      return true;
     }
   }
 
@@ -537,6 +533,8 @@ const index_t &Minefield::getNrMines()
 #ifdef MW_DEBUG
 void Minefield::printField()
 {
+  MW_SET_FUNC_SCOPE;
+
   if (!this->field_inizialized) return;
 
   std::stringstream field;
@@ -551,7 +549,11 @@ void Minefield::printField()
     field << '\n';
   }
 
-  MW_LOG(info) << "field:\n" << field.str();
+  try {
+    MW_LOG(info) << "field:\n" << field.str();
+  } catch (std::exception &exc) {
+    MW_LOG(error) << "Cannot print field: " << exc.what();
+  }
 }
 #endif // defined(MW_DEBUG)
 
