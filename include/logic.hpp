@@ -44,7 +44,7 @@ private:
 
     // runtime
     uint8_t \
-      nr_surrounding_flags      = 8u,
+      nr_surrounding_flags      = 0u,
       nr_surrounding_untouched  = 8u;
   } tile_t;
   friend std::ostream &operator<<(std::ostream &stream, const tile_t &tile);
