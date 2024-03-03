@@ -15,7 +15,7 @@ BOOST_LOG_ATTRIBUTE_KEYWORD(expr_origin, "Origin", boost::log::attributes::const
 void logFormatter(const boost::log::record_view &record_view, boost::log::basic_formatting_ostream<char> &stream)
 {
   auto named_scope = record_view[expr_named_scope];
-  stream << '[' << record_view[expr_origin] << "->" << named_scope.get().back().scope_name << "] ";
+  stream << '[' << record_view[expr_origin] << "::" << named_scope.get().back().scope_name << "] ";
 
   auto severity = record_view[boost::log::trivial::severity];
   switch (severity.get())
