@@ -175,7 +175,7 @@ public:
    *
    * @returns nr of mines
    */
-  const index_t &getNrMines();
+  inline const index_t &getNrMines();
 
   /* #endregion */
 
@@ -236,7 +236,7 @@ private:
    *
    * @returns number of mines
    */
-  index_t calculateNrOfMines();
+  inline index_t calculateNrOfMines();
 
   /**
    * @brief Check if the given position is inside the field boundaries.

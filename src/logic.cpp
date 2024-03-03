@@ -31,11 +31,11 @@ const std::array<Minefield::tile_offset_t, 4ul> Minefield::directions = {{
 std::ostream &operator<<(std::ostream &stream, const Minefield::tile_t &tile)
 {
   stream << std::boolalpha << "{"
-    "is mine: " << tile.is_mine << " "
-    "nr surrounding mines: " << (int)tile.nr_surrounding_mines << "  "
-    "is flagged: " << tile.is_flagged << " "
-    "is revealed: " << tile.is_revealed << " "
-    "nr surrounding flags: " << (int)tile.nr_surrounding_flags << " "
+    "is mine: " << tile.is_mine << "; "
+    "nr surrounding mines: " << (int)tile.nr_surrounding_mines << "; "
+    "is flagged: " << tile.is_flagged << "; "
+    "is revealed: " << tile.is_revealed << "; "
+    "nr surrounding flags: " << (int)tile.nr_surrounding_flags << "; "
     "nr surrounding untouched: " << (int)tile.nr_surrounding_untouched << '}';
 
   return stream;
@@ -59,7 +59,8 @@ inline bool operator<(const Minefield::tile_position_t &left, const Minefield::t
 
 /* #region minefield generation */
 
-Minefield::Minefield(index_t rows, index_t cols) : current_field_size{rows, cols}
+Minefield::Minefield(index_t rows, index_t cols):
+  current_field_size{rows, cols}
 {
   MW_SET_CLASS_ORIGIN;
   MW_SET_FUNC_SCOPE;
@@ -103,6 +104,8 @@ void Minefield::initFields(index_t row, index_t col)
 {
   MW_SET_FUNC_SCOPE;
 
+  MW_LOG(trace) << "initialize field from row=" << row << " col=" << col;
+
   // setup random device
   std::random_device random_device;
   std::mt19937 mersenne_twister(random_device());
@@ -124,6 +127,7 @@ void Minefield::initFields(index_t row, index_t col)
   }
 
 # ifdef MW_DEBUG
+  //! TODO: add set stream operator implementation
   std::stringstream patch;
   patch << "initial patch: ";
   for (const tile_position_t& tile_pos: initial_patch)
@@ -204,7 +208,7 @@ bool Minefield::revealTile(index_t row, index_t col, cascade_t &o_revealed_field
 {
   MW_SET_FUNC_SCOPE;
 
-  MW_LOG(trace) << "activating at row=" << row << " col=" << col;
+  MW_LOG(trace) << "reveal @ row=" << row << " col=" << col;
 
   if (!this->tilePositionValid(row, col))
   {
@@ -268,6 +272,8 @@ bool Minefield::toggleTileFlag(index_t row, index_t col, bool &o_is_flagged)
 {
   MW_SET_FUNC_SCOPE;
 
+  MW_LOG(trace) << "toggling flag @ row=" << row << " col=" << col;
+
   if (!this->tilePositionValid(row, col))
   {
     MW_LOG_INVALID_TILE;
@@ -284,6 +290,7 @@ bool Minefield::toggleTileFlag(index_t row, index_t col, bool &o_is_flagged)
   tile.is_flagged = !tile.is_flagged;
   o_is_flagged = (tile.is_flagged);
 
+  MW_LOG(debug) << "flag is now flagged: " << std::boolalpha << o_is_flagged;
 
   this->forSurroundingMines(
     row, col,
@@ -301,6 +308,8 @@ bool Minefield::toggleTileFlag(index_t row, index_t col, bool &o_is_flagged)
 
 void Minefield::revealTilesForUser(cascade_t &o_revealed_fields)
 {
+  MW_SET_FUNC_SCOPE;
+
   /**
    * 1. generate list of all unrevealed tiles adjacent to revealed ones
    * 2. iterate over those and check if revealing those would solve the problem
@@ -321,7 +330,7 @@ void Minefield::revealTileInternal(index_t row, index_t col, std::vector<tile_wi
   std::queue<tile_position_t> field_queue;
   if (tile.is_revealed && tile.nr_surrounding_mines == tile.nr_surrounding_flags)
   {
-    // tile is revealed and is surrounded by as many flagged fields as there are mines around it
+    MW_LOG(trace) << "tile is revealed and satisfied";
 
     index_t \
       above = row - 1l,
@@ -340,15 +349,13 @@ void Minefield::revealTileInternal(index_t row, index_t col, std::vector<tile_wi
   }
   else if (!tile.is_revealed && !tile.is_flagged)
   {
-    // tile is not yet revealed
+    MW_LOG(trace) << "tile is not available for reveal";
 
     field_queue.push(tile_position_t{row, col});
   }
   else
   {
-    // not enough adjacent flagged fields or field itself is flagged
-
-    MW_LOG(warning) << "can not activate field";
+    MW_LOG(trace) << "nothing to reveal";
     MW_LOG(debug) << tile;
 
     return;
@@ -361,20 +368,13 @@ void Minefield::revealTileInternal(index_t row, index_t col, std::vector<tile_wi
     tile_position_t current_tile_pos = std::move(field_queue.front());
     field_queue.pop();
 
-    if (!this->tilePositionValid(current_tile_pos.row, current_tile_pos.col))
-    {
-      // field does not exist
-      continue;
-    }
+    MW_LOG(trace) << "processing queue tile @ row=" << current_tile_pos.row << " col=" << current_tile_pos.col;
+
+    if (!this->tilePositionValid(current_tile_pos.row, current_tile_pos.col)) continue;
     tile_t &current_tile = this->getTile(current_tile_pos.row, current_tile_pos.col);
 
     // check if we need to evaluate further
-    if (current_tile.is_flagged || current_tile.is_revealed)
-    {
-      // already "revealed" thus not interesting
-
-      continue;
-    }
+    if (current_tile.is_flagged || current_tile.is_revealed) continue;
 
     // should be revealed now
     current_tile.is_revealed = true;
@@ -389,7 +389,7 @@ void Minefield::revealTileInternal(index_t row, index_t col, std::vector<tile_wi
     // check if we hit a mine
     if (current_tile.is_mine)
     {
-      // signal that a mine is revealed and stop since further evaluation is not needed
+      MW_LOG(trace) << "hit a mine";
 
       o_has_revealed_mine = true;
       o_revealed_fields.push_back(tile_with_position_t{current_tile_pos.row, current_tile_pos.col, -1});
@@ -398,12 +398,15 @@ void Minefield::revealTileInternal(index_t row, index_t col, std::vector<tile_wi
     }
     else
     {
+      MW_LOG(trace) << "hit normal tile";
       o_revealed_fields.push_back(tile_with_position_t{current_tile_pos.row, current_tile_pos.col, current_tile.nr_surrounding_mines});
     }
 
     // if we hit an "empty" (no adjacent mines) reveal, add all adjacent fields to the queue
     if (current_tile.nr_surrounding_mines == 0)
     {
+      MW_LOG(trace) << "adding new elements to queue";
+
       index_t \
         above = current_tile_pos.row - 1l,
         below = current_tile_pos.row + 1l,
@@ -426,6 +429,10 @@ void Minefield::revealTileInternal(index_t row, index_t col, std::vector<tile_wi
 
 void Minefield::forSurroundingMines(index_t row, index_t col, for_surrounding_tiles_callback_t callback, const void *user_data)
 {
+  MW_SET_FUNC_SCOPE;
+
+  MW_LOG(trace) << "iterating around row=" << row << " col=" << col;
+
   for (const tile_offset_t& offset: this->offsets)
   {
     const index_t \
@@ -433,6 +440,8 @@ void Minefield::forSurroundingMines(index_t row, index_t col, for_surrounding_ti
       current_col = col + offset.cols;
 
     if (!this->tilePositionValid(current_row, current_col)) continue;
+
+    MW_LOG(trace) << "surrounding tile @ row=" << current_row << " col=" << current_col;
 
     callback(this->getTile(current_row, current_col), user_data);
   }
@@ -534,34 +543,26 @@ bool Minefield::checkHasAvailableMoves()
 /* #endregion */
 /* #region getters */
 
-const index_t &Minefield::getNrMines()
+inline const index_t &Minefield::getNrMines()
 {
-  MW_SET_FUNC_SCOPE;
-
   return this->nr_of_mines;
 }
 
-index_t Minefield::calculateNrOfMines()
+inline index_t Minefield::calculateNrOfMines()
 {
-  MW_SET_FUNC_SCOPE;
-
   return DEFAULT_BOMB_FACTOR * this->field_size;
 }
 
 inline bool Minefield::tilePositionValid(index_t row, index_t col)
 {
-  MW_SET_FUNC_SCOPE;
-
   return (
     row >= 0l && row < this->current_field_size.rows &&
     col >= 0l && col < this->current_field_size.cols
   );
 }
 
-Minefield::tile_t &Minefield::getTile(index_t row, index_t col)
+inline Minefield::tile_t &Minefield::getTile(index_t row, index_t col)
 {
-  MW_SET_FUNC_SCOPE;
-
   return this->field[row * this->current_field_size.cols + col];
 }
 
