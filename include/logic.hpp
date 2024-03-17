@@ -229,7 +229,7 @@ private:
     index_t row,
     index_t col,
     for_surrounding_tiles_callback_t callback,
-    const void *user_data = nullptr
+    void *user_data = nullptr
   );
 
   /* #endregion */
