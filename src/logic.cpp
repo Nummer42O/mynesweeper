@@ -214,7 +214,7 @@ void Minefield::initFields(index_t row, index_t col)
         current_row = tile_pos.row + offset.rows,
         current_col = tile_pos.col + offset.cols;
 
-      if (!this->tilePositionValid(current_row, current_col)) continue;
+      if (!this->checkTilePositionValid(current_row, current_col)) continue;
       tile_t &current_tile = this->getTile(current_row, current_col);
 
       current_tile.nr_surrounding_mines++;
@@ -231,7 +231,7 @@ bool Minefield::revealTile(index_t row, index_t col, cascade_t &o_revealed_field
 
   MW_LOG(trace) << "reveal @ row=" << row << " col=" << col;
 
-  if (!this->tilePositionValid(row, col))
+  if (!this->checkTilePositionValid(row, col))
   {
     MW_LOG_INVALID_TILE;
 
@@ -255,7 +255,7 @@ bool Minefield::undoTileReveal(index_t row, index_t col)
 
   MW_LOG(trace) << "undoing field activation at row=" << row << " col=" << col;
 
-  if (!this->tilePositionValid(row, col))
+  if (!this->checkTilePositionValid(row, col))
   {
     MW_LOG_INVALID_TILE;
 
@@ -281,7 +281,7 @@ bool Minefield::toggleTileFlag(index_t row, index_t col, bool &o_is_flagged)
 
   MW_LOG(trace) << "toggling flag @ row=" << row << " col=" << col;
 
-  if (!this->tilePositionValid(row, col))
+  if (!this->checkTilePositionValid(row, col))
   {
     MW_LOG_INVALID_TILE;
 
@@ -378,7 +378,7 @@ void Minefield::revealTileInternal(index_t row, index_t col, std::vector<tile_wi
 
     MW_LOG(trace) << "processing queue tile @ row=" << current_tile_pos.row << " col=" << current_tile_pos.col;
 
-    if (!this->tilePositionValid(current_tile_pos.row, current_tile_pos.col)) continue;
+    if (!this->checkTilePositionValid(current_tile_pos.row, current_tile_pos.col)) continue;
     tile_t &current_tile = this->getTile(current_tile_pos.row, current_tile_pos.col);
 
     // check if we need to evaluate further
@@ -447,7 +447,7 @@ void Minefield::forSurroundingMines(index_t row, index_t col, for_surrounding_ti
       current_row = row + offset.rows,
       current_col = col + offset.cols;
 
-    if (!this->tilePositionValid(current_row, current_col)) continue;
+    if (!this->checkTilePositionValid(current_row, current_col)) continue;
 
     MW_LOG(trace) << "surrounding tile @ row=" << current_row << " col=" << current_col;
 
@@ -520,6 +520,14 @@ bool Minefield::checkHasAvailableMoves()
   MW_LOG(warning) << "No more available moves.";
 
   return false;
+}
+
+inline bool Minefield::checkTilePositionValid(index_t row, index_t col)
+{
+  return (
+    row >= 0l && row < this->current_field_size.rows &&
+    col >= 0l && col < this->current_field_size.cols
+  );
 }
 
 /* #endregion */

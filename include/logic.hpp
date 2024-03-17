@@ -250,7 +250,7 @@ private:
    *
    * @return true if row/col are in bounds, false otherwise
    */
-  inline bool tilePositionValid(
+  inline bool checkTilePositionValid(
     index_t row,
     index_t col
   );
