@@ -499,18 +499,7 @@ bool Minefield::checkHasAvailableMoves()
       (tile.is_revealed && tile.nr_surrounding_mines == 0)
     ) continue;
 
-    MW_LOG(debug) << tile;
-
-    /**
-     * NOTE: a tile has moves available, when...
-     *  ...a satisfied mine has still non-revealed fields
-     *  ...a non-satisfied mine has the same number unrevealed adjacent tiles as remaining unflagged adjacent mines
-    */
-    const bool tile_satisfied = (tile.nr_surrounding_flags == tile.nr_surrounding_mines);
-    if (
-      (tile_satisfied && tile.nr_surrounding_untouched > 0) ||
-      (!tile_satisfied && tile.nr_surrounding_untouched == (tile.nr_surrounding_mines - tile.nr_surrounding_flags))
-    )
+    if (this->checkTileHasAvailableMoves(tile))
     {
       MW_LOG(debug) << "moves available @ row=" << idx / this->current_field_size.cols << " cols=" << idx % this->current_field_size.cols;
       return true;
@@ -557,17 +546,23 @@ std::string Minefield::getTileString(index_t row, index_t col)
 }
 #endif // defined(MW_DEBUG)
 
+inline bool Minefield::checkTileHasAvailableMoves(const tile_t &tile)
+{
+  /**
+   * NOTE: a tile has moves available, when...
+   *  ...a satisfied mine has still non-revealed fields
+   *  ...a non-satisfied mine has the same number unrevealed adjacent tiles as remaining unflagged adjacent mines
+  */
+  const bool tile_satisfied = (tile.nr_surrounding_flags == tile.nr_surrounding_mines);
+  return (
+    ( tile_satisfied && tile.nr_surrounding_untouched > 0) ||
+    (!tile_satisfied && tile.nr_surrounding_untouched == (tile.nr_surrounding_mines - tile.nr_surrounding_flags))
+  );
+}
+
 inline index_t Minefield::calculateNrOfMines()
 {
   return DEFAULT_BOMB_FACTOR * this->field_size;
-}
-
-inline bool Minefield::tilePositionValid(index_t row, index_t col)
-{
-  return (
-    row >= 0l && row < this->current_field_size.rows &&
-    col >= 0l && col < this->current_field_size.cols
-  );
 }
 
 inline Minefield::tile_t &Minefield::getTile(index_t row, index_t col)

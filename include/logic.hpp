@@ -233,14 +233,7 @@ private:
   );
 
   /* #endregion */
-  /* #region getters */
-
-  /**
-   * @brief Calculate number of mines from field count.
-   *
-   * @returns number of mines
-   */
-  inline index_t calculateNrOfMines();
+  /* #region status checkers */
 
   /**
    * @brief Check if the given position is inside the field boundaries.
@@ -254,6 +247,29 @@ private:
     index_t row,
     index_t col
   );
+
+  /**
+   * @brief Check if a tile has available moves.
+   *
+   * @note Wether this check makes sense on this tile does not get checked.
+   *
+   * @param tile reference tile to be checked
+   *
+   * @return true if moves are available, false otherwise
+   */
+  static inline bool checkTileHasAvailableMoves(
+    const tile_t &tile
+  );
+
+  /* #endregion*/
+  /* #region getters */
+
+  /**
+   * @brief Calculate number of mines from field count.
+   *
+   * @returns number of mines
+   */
+  inline index_t calculateNrOfMines();
 
   /**
    * @brief Get the tile at the specified position.
