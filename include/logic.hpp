@@ -61,7 +61,13 @@ private:
     int64_t rows, cols;
   } tile_offset_t;
 
-  typedef void (*for_surrounding_tiles_callback_t)(tile_t &, const void *);
+  /**
+   * @param tile the currently selected adjacent tile
+   * @param user_data custom data given to the callback
+   *
+   * @returns true if the loop for be exited, false otherwise
+   */
+  typedef bool (*for_surrounding_tiles_callback_t)(tile_t &tile, void *user_data);
 
 public:
   /* #region minefield generation */

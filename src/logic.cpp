@@ -266,9 +266,11 @@ bool Minefield::undoTileReveal(index_t row, index_t col)
   tile.is_revealed = false;
   this->forSurroundingMines(
     row, col,
-    [](tile_t &surrounding_tile, void *)
+    [](tile_t &surrounding_tile, void *) -> bool
     {
       surrounding_tile.nr_surrounding_untouched++;
+
+      return false;
     }
   );
 
@@ -301,12 +303,14 @@ bool Minefield::toggleTileFlag(index_t row, index_t col, bool &o_is_flagged)
 
   this->forSurroundingMines(
     row, col,
-    [](tile_t &surrounding_tile, void *user_data)
+    [](tile_t &surrounding_tile, void *user_data) -> bool
     {
       //! NOTE: (int)false = 0 -> offset = -1; (int)true = 1 -> 1
       const int8_t offset = 2 * (*static_cast<const int8_t *>(user_data)) - 1;
       surrounding_tile.nr_surrounding_flags += offset;
       surrounding_tile.nr_surrounding_untouched -= offset;
+
+      return false;
     },
     &o_is_flagged
   );
@@ -388,9 +392,11 @@ void Minefield::revealTileInternal(index_t row, index_t col, std::vector<tile_wi
     current_tile.is_revealed = true;
     this->forSurroundingMines(
       current_tile_pos.row, current_tile_pos.col,
-      [](tile_t &surrounding_tile, void *)
+      [](tile_t &surrounding_tile, void *) -> bool
       {
         surrounding_tile.nr_surrounding_untouched--;
+
+        return false;
       }
     );
 
@@ -451,7 +457,7 @@ void Minefield::forSurroundingMines(index_t row, index_t col, for_surrounding_ti
 
     MW_LOG(trace) << "surrounding tile @ row=" << current_row << " col=" << current_col;
 
-    callback(this->getTile(current_row, current_col), user_data);
+    if (callback(this->getTile(current_row, current_col), user_data)) break;
   }
 }
 
