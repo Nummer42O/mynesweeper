@@ -327,6 +327,44 @@ void Minefield::revealTilesForUser(cascade_t &o_revealed_fields)
    * 2. iterate over those and check if revealing those would solve the problem
    * 3. if none of those solve the problem, reveal any of them, remove it from list and repeat from 2.
    */
+
+  bool has_moves_available;
+  do
+  {
+    for (index_t row = 0l; row < this->current_field_size.rows && !has_moves_available; row++)
+    {
+      for (index_t col = 0l; col < this->current_field_size.cols && !has_moves_available; col++)
+      {
+        const tile_t &tile = this->getTile(row, col);
+
+        // only keep untouched tiles
+        const bool is_untouched = (tile.is_revealed || tile.is_mine || tile.is_flagged);
+        if (is_untouched || tile.nr_surrounding_untouched == 0u) continue;
+
+        this->forSurroundingMines(
+          row, col,
+          [](tile_t &tile, void *user_data) -> bool
+          {
+            tile.nr_surrounding_untouched--;
+
+            if (Minefield::checkTileHasAvailableMoves(tile))
+            {
+              *reinterpret_cast<bool *>(user_data) = true;
+            }
+          },
+          &has_moves_available
+        );
+
+        if (!has_moves_available)
+        {
+          // TODO: undo
+        }
+
+        // TODO: HOW THE FUCK DO WE DETECT THE END OF THE LOOP?
+      }
+    }
+  }
+  while (!has_moves_available);
 }
 
 void Minefield::revealTileInternal(index_t row, index_t col, std::vector<tile_with_position_t> &o_revealed_fields, bool &o_has_revealed_mine)

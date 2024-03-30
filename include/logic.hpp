@@ -53,6 +53,7 @@ private:
   {
     index_t row, col;
   } tile_position_t;
+  //! TODO: operator<<
   friend inline bool operator==(const tile_position_t &left, const tile_position_t &right);
   friend inline bool operator<(const tile_position_t &left, const tile_position_t &right);
 
