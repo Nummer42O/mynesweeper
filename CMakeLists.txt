@@ -1,5 +1,7 @@
-cmake_minimum_required(VERSION 3.10)
-project(minesweeper)
+## / ##
+
+cmake_minimum_required(VERSION 3.16)
+project(mynesweeper)
 
 # set standard
 set(CMAKE_CXX_STANDARD 20)
@@ -21,43 +23,14 @@ else()
   set(_NEEDS_TERMINAL "false")
 endif()
 
-# use the package PkgConfig to detect GTK+ headers/library files
-find_package(PkgConfig 0.29 REQUIRED)
-pkg_check_modules(
-  GTKMM
-  IMPORTED_TARGET
-    gtkmm-3.0
-    glibmm-2.4
-  REQUIRED
-)
 
-find_package(Boost 1.71
-  COMPONENTS log
-  REQUIRED
-)
+find_package(PkgConfig 0.29 REQUIRED)
 
 # build
-add_executable(${_EXECUTABLE_NAME}
-  # graphics
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/window.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/new_game_dialog.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/no_moves_left_dialog.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/tile.cpp
-  # logic
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/logic.cpp
-  # main application
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/application.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
-)
-target_link_libraries(${_EXECUTABLE_NAME}
-  PRIVATE
-    ${GTKMM_LIBRARIES}
-    ${Boost_LIBRARIES}
-)
+add_executable(${_EXECUTABLE_NAME})
 target_include_directories(${_EXECUTABLE_NAME}
   PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${GTKMM_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/minesweeper
 )
 target_compile_definitions(${_EXECUTABLE_NAME}
   PRIVATE
@@ -66,6 +39,8 @@ target_compile_definitions(${_EXECUTABLE_NAME}
     EXECUTABLE_NAME="${_EXECUTABLE_NAME}"
     ${_DEBUG_DEFINITION}
 )
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/minesweeper)
 
 # configure
 configure_file(
