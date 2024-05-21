@@ -506,8 +506,6 @@ bool Minefield::checkGameWon()
 {
   MW_SET_FUNC_SCOPE;
 
-  //! TODO: CONTINUE HERE (use the newly introduces runtime variables on the tiles)
-
   index_t \
     revealed_tiles_count = 0l,
     correctly_flagged_mines_count = 0l;

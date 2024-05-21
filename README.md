@@ -10,6 +10,9 @@ Fell absolutely free to post Issues and PRs, but no guarantees.
 
 ## TODO:
 
+- [ ] replace field iterations with generator
+- [ ] use output operators
+- [ ] restructuring of logic
 - [ ] add "auto" mode just for the sake of it
 - [ ] add "no more moves" warning -> reveal certain fields on random to push game forward
 - [ ] add easy, medium, hard quickselect buttons to new game dialog
