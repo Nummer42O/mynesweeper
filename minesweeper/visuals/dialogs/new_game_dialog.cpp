@@ -1,5 +1,9 @@
 #include "new_game_dialog.hpp"
 
+namespace visuals
+{
+namespace dialogs
+{
 
 const std::unordered_map<NewGameDialog::Type, Glib::ustring> NewGameDialog::type2text {
   {Type::START, "Lets get started, pick a size:"},
@@ -104,4 +108,7 @@ NewGameDialog::ReturnType NewGameDialog::run(Type type, index_t &io_rows, index_
   }
 
   return result;
+}
+
+}
 }

@@ -12,6 +12,8 @@
 #include <iostream>
 #include <iomanip>
 
+namespace logic
+{
 
 Minefield::tile_t Minefield::default_tile = Minefield::tile_t{};
 
@@ -613,3 +615,5 @@ inline Minefield::tile_t &Minefield::getTile(index_t row, index_t col)
 }
 
 /* #endregion */
+
+}

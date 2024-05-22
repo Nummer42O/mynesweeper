@@ -6,6 +6,11 @@
 #include <gtkmm.h>
 
 
+namespace visuals
+{
+namespace dialogs
+{
+
 class NoMovesLeftDialog: public Gtk::Dialog
 {
 public:
@@ -36,3 +41,6 @@ private:
 
   MW_DECLARE_LOGGER;
 };
+
+}
+}

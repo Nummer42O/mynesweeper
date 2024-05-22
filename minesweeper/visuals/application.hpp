@@ -9,6 +9,9 @@
 #include <memory>
 
 
+namespace visuals
+{
+
 class Application : public Gtk::Application
 {
 public:
@@ -41,8 +44,8 @@ private:
    *
    * @returns wether to restart, undo or quit
    */
-  NewGameDialog::ReturnType showNewGame(
-    NewGameDialog::Type type,
+  visuals::dialogs::NewGameDialog::ReturnType showNewGame(
+    visuals::dialogs::NewGameDialog::Type type,
     index_t &o_rows,
     index_t &o_cols
   );
@@ -52,7 +55,7 @@ private:
    *
    * @returns wether to help, not help or restart instead
    */
-  NoMovesLeftDialog::ReturnType showNoMovesLeft();
+  visuals::dialogs::NoMovesLeftDialog::ReturnType showNoMovesLeft();
 
   /* #endregion */
   /* #region Mouse Callbacks */
@@ -109,7 +112,7 @@ private:
    *
    * @returns wether the user backpedals and requested an undo or not
    */
-  bool newGame(NewGameDialog::Type type);
+  bool newGame(visuals::dialogs::NewGameDialog::Type type);
 
   /**
    * @brief Check and handle if the game if won or no more moves are available.
@@ -122,10 +125,12 @@ private:
   MW_DECLARE_LOGGER;
 
   std::unique_ptr<Window> window = nullptr;
-  std::unique_ptr<Minefield> minefield = nullptr;
+  std::unique_ptr<logic::Minefield> minefield = nullptr;
 
-  std::shared_ptr<NewGameDialog> new_game_dialog = nullptr;
-  std::shared_ptr<NoMovesLeftDialog> no_moves_left_dialog = nullptr;
+  std::shared_ptr<visuals::dialogs::NewGameDialog> new_game_dialog = nullptr;
+  std::shared_ptr<visuals::dialogs::NoMovesLeftDialog> no_moves_left_dialog = nullptr;
 
   field_size_t current_field_size;
 };
+
+}

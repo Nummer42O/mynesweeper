@@ -62,6 +62,6 @@ void initLogging(boost::log::trivial::severity_level log_level)
 int main(int argc, char *argv[]) {
   initLogging(boost::log::trivial::severity_level::trace);
 
-  Application app;
+  visuals::Application app;
   return app.run(argc, argv);
 }

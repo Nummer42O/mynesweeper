@@ -11,6 +11,9 @@
 #include <sigc++/sigc++.h>
 
 
+namespace logic
+{
+
 class Minefield
 {
 public:
@@ -310,3 +313,5 @@ private:
   static const std::array<tile_offset_t, 8ul> offsets;
   static const std::array<tile_offset_t, 4ul> directions;
 };
+
+}

@@ -8,7 +8,10 @@
 #include <sysexits.h>
 
 
-Window::Window(Tile::callback_t tile_clicked_callback):
+namespace visuals
+{
+
+Window::Window(visuals::widgets::Tile::callback_t tile_clicked_callback):
   shared_tile_clicked_callback(tile_clicked_callback)
 {
   MW_SET_CLASS_ORIGIN;
@@ -131,7 +134,7 @@ void Window::generateMinefield(index_t rows, index_t cols, index_t nr_bombs)
   {
     for (index_t idx = old_tile_count; idx < new_tile_count; idx++)
     {
-      Tile *new_tile = Gtk::make_managed<Tile>(this->shared_tile_clicked_callback, this->flagged_sprites, this->untouched_sprites);
+      visuals::widgets::Tile *new_tile = Gtk::make_managed<visuals::widgets::Tile>(this->shared_tile_clicked_callback, this->flagged_sprites, this->untouched_sprites);
       this->field_widget.add(*new_tile);
 
 #     ifdef MW_DEBUG
@@ -156,7 +159,7 @@ void Window::generateMinefield(index_t rows, index_t cols, index_t nr_bombs)
     const index_t  row = idx / cols,
                   col = idx % cols;
 
-    Tile *tile = static_cast<Tile *>(children.at(idx));
+    visuals::widgets::Tile *tile = static_cast<visuals::widgets::Tile *>(children.at(idx));
     tile->setPosition(row, col);
     tile->reset();
 
@@ -183,7 +186,7 @@ void Window::resetMinefield()
 
   for (Gtk::Widget *widget: this->field_widget.get_children())
   {
-    static_cast<Tile *>(widget)->reset();
+    static_cast<visuals::widgets::Tile *>(widget)->reset();
   }
 
   this->current_mines = 0l;
@@ -248,7 +251,9 @@ bool Window::loadSprites()
   return true;
 }
 
-inline Tile *Window::getTile(index_t row, index_t col)
+inline visuals::widgets::Tile *Window::getTile(index_t row, index_t col)
 {
-  return static_cast<Tile *>(this->field_widget.get_child_at(col, row));
+  return static_cast<visuals::widgets::Tile *>(this->field_widget.get_child_at(col, row));
+}
+
 }

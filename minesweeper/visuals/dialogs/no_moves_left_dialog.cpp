@@ -1,6 +1,11 @@
 #include "no_moves_left_dialog.hpp"
 
 
+namespace visuals
+{
+namespace dialogs
+{
+
 NoMovesLeftDialog::NoMovesLeftDialog(Gtk::Window &parent):
   Dialog("No Moves Left", parent, Gtk::DIALOG_DESTROY_WITH_PARENT | Gtk::DIALOG_MODAL)
 {
@@ -51,4 +56,7 @@ NoMovesLeftDialog::ReturnType NoMovesLeftDialog::run()
   }
 
   return result;
+}
+
+}
 }

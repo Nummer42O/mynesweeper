@@ -6,6 +6,11 @@
 #include <gtkmm.h>
 
 
+namespace visuals
+{
+namespace widgets
+{
+
 class Tile : public Gtk::EventBox
 {
 public:
@@ -111,3 +116,6 @@ private:
 
   state_sprites_t flagged_sprites, untouched_sprites;
 };
+
+}
+}

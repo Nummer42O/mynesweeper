@@ -11,6 +11,9 @@
 #include <memory>
 
 
+namespace visuals
+{
+
 class Window : public Gtk::Window
 {
 public:
@@ -25,7 +28,7 @@ public:
    * @param tile_clicked_callback the callback to relay to all tiles
    */
   Window(
-    Tile::callback_t tile_clicked_callback
+    visuals::widgets::Tile::callback_t tile_clicked_callback
   );
 
   /**
@@ -125,7 +128,7 @@ private:
    *
    * @return a pointer to the tile
    */
-  inline Tile *getTile(index_t row, index_t col);
+  inline visuals::widgets::Tile*getTile(index_t row, index_t col);
 
 private:
   MW_DECLARE_LOGGER;
@@ -142,10 +145,12 @@ private:
   Gtk::Label nr_bombs_widget;
   Gtk::Button restart_widget;
 
-  Tile::callback_t shared_tile_clicked_callback;
+  visuals::widgets::Tile::callback_t shared_tile_clicked_callback;
   sigc::connection restart_button_callback_connection;
 
 # ifdef MW_DEBUG
   sigc::slot<std::string, index_t, index_t> tile_information_callback;
 # endif //!defined(MW_DEBUG)
 };
+
+}

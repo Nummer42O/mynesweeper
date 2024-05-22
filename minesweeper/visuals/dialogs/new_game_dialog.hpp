@@ -6,6 +6,11 @@
 #include <gtkmm.h>
 
 
+namespace visuals
+{
+namespace dialogs
+{
+
 class NewGameDialog : public Gtk::Dialog
 {
 public:
@@ -61,3 +66,6 @@ private:
   Gtk::Label  main_text;
   Gtk::Button *undo_button;
 };
+
+}
+}

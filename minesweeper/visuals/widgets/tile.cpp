@@ -6,6 +6,11 @@
 #endif // defined(MW_DEBUG)
 
 
+namespace visuals
+{
+namespace widgets
+{
+
 Tile::Tile(callback_t click_callback, const state_sprites_t &flagged, const state_sprites_t &untouched):
   EventBox(),
   click_callback(click_callback),
@@ -129,4 +134,7 @@ bool Tile::buttonReleaseCallback(GdkEventButton *button)
   }
 
   return false;
+}
+
+}
 }
