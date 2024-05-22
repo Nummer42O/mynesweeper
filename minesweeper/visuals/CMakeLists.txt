@@ -17,7 +17,6 @@ target_sources(${_EXECUTABLE_NAME}
 )
 target_include_directories(${_EXECUTABLE_NAME}
   PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}
     ${GTKMM_INCLUDE_DIRS}
 )
 target_link_libraries(${_EXECUTABLE_NAME}

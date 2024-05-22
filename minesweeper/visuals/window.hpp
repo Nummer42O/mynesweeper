@@ -1,8 +1,8 @@
 #pragma once
 
 #include "defines.hpp"
-#include "tile.hpp"
 #include "debug.hpp"
+#include "visuals/widgets/tile.hpp"
 
 #include <gtkmm.h>
 

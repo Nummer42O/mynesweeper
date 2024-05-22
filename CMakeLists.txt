@@ -28,10 +28,6 @@ find_package(PkgConfig 0.29 REQUIRED)
 
 # build
 add_executable(${_EXECUTABLE_NAME})
-target_include_directories(${_EXECUTABLE_NAME}
-  PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/minesweeper
-)
 target_compile_definitions(${_EXECUTABLE_NAME}
   PRIVATE
     SPRITE_DIRECTORY="$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/sprites>$<INSTALL_INTERFACE:${_INSTALL_SPRITE_DIRECTORY}>"

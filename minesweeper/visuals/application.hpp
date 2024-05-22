@@ -1,9 +1,9 @@
 #pragma once
 
-#include "window.hpp"
-#include "new_game_dialog.hpp"
-#include "no_moves_left_dialog.hpp"
-#include "logic.hpp"
+#include "visuals/window.hpp"
+#include "visuals/dialogs/new_game_dialog.hpp"
+#include "visuals/dialogs/no_moves_left_dialog.hpp"
+#include "logic/logic.hpp"
 #include "debug.hpp"
 
 #include <memory>

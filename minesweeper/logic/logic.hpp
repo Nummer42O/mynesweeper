@@ -10,6 +10,7 @@
 #include <optional>
 #include <sigc++/sigc++.h>
 
+
 class Minefield
 {
 public:

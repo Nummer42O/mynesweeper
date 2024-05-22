@@ -1,4 +1,4 @@
-#include "application.hpp"
+#include "visuals/application.hpp"
 
 #include "debug.hpp"
 
