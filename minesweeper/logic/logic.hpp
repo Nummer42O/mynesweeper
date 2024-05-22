@@ -27,13 +27,6 @@ public:
 
   typedef std::vector<tile_with_position_t> cascade_t;
 
-  enum class ToggleFieldFlagStatus
-  {
-    OK,
-    INVALID_TILE,
-    ALREADY_REVEALED
-  };
-
 private:
   typedef struct
   {
