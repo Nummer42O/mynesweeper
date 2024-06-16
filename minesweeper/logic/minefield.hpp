@@ -2,6 +2,7 @@
 
 #include "debug.hpp"
 #include "defines.hpp"
+#include "structs.hpp"
 
 #include <cstdlib>
 #include <cstdint>
@@ -13,59 +14,21 @@
 
 namespace logic
 {
+namespace minefield
+{
 
 class Minefield
 {
-public:
-  typedef struct
-  {
-    index_t row, col;
-
-    // number (1-8), empty (0) or mine (-1)
-    int type;
-  } tile_with_position_t;
-
-  typedef std::vector<tile_with_position_t> cascade_t;
-
 private:
-  typedef struct
-  {
-    // semi constant
-    bool is_mine = false;
-    uint8_t nr_surrounding_mines = 0u;
-
-    // toggleable
-    bool \
-      is_flagged  = false,
-      is_revealed = false;
-
-    // runtime
-    uint8_t \
-      nr_surrounding_flags      = 0u,
-      nr_surrounding_untouched  = 8u;
-  } tile_t;
-  friend std::ostream &operator<<(std::ostream &stream, const tile_t &tile);
-
-  typedef struct
-  {
-    index_t row, col;
-  } tile_position_t;
-  //! TODO: operator<<
-  friend inline bool operator==(const tile_position_t &left, const tile_position_t &right);
-  friend inline bool operator<(const tile_position_t &left, const tile_position_t &right);
-
-  typedef struct
-  {
-    int64_t rows, cols;
-  } tile_offset_t;
-
   /**
    * @param tile the currently selected adjacent tile
    * @param user_data custom data given to the callback
    *
    * @returns true if the loop for be exited, false otherwise
    */
-  typedef bool (*for_surrounding_tiles_callback_t)(tile_t &tile, void *user_data);
+  typedef bool (*for_surrounding_tiles_callback_t)(structs::tile_t &tile, void *user_data);
+
+  typedef std::vector<structs::tile_with_position_t> cascade_t;
 
 public:
   /* #region minefield generation */
@@ -215,7 +178,7 @@ private:
   void revealTileInternal(
     index_t row,
     index_t col,
-    std::vector<tile_with_position_t> &o_revealed_fields,
+    std::vector<structs::tile_with_position_t> &o_revealed_fields,
     bool &o_has_revealed_mine
   );
 
@@ -262,7 +225,7 @@ private:
    * @return true if moves are available, false otherwise
    */
   static inline bool checkTileHasAvailableMoves(
-    const tile_t &tile
+    const structs::tile_t &tile
   );
 
   /* #endregion*/
@@ -285,7 +248,7 @@ private:
    *
    * @returns the selected tile
    */
-  inline tile_t &getTile(
+  inline structs::tile_t &getTile(
     index_t row,
     index_t col
   );
@@ -299,12 +262,13 @@ private:
   index_t nr_of_mines;
 
   index_t field_size;
-  std::vector<tile_t> field;
+  std::vector<structs::tile_t> field;
   bool field_initialized = false;
 
-  static tile_t default_tile;
-  static const std::array<tile_offset_t, 8ul> offsets;
-  static const std::array<tile_offset_t, 4ul> directions;
+  static structs::tile_t default_tile;
+  static const std::array<structs::tile_offset_t, 8ul> offsets;
+  static const std::array<structs::tile_offset_t, 4ul> directions;
 };
 
+}
 }
