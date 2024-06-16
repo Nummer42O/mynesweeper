@@ -2,9 +2,9 @@
 
 
 namespace logic {
-namespace structs {
+namespace tile {
 
-std::ostream &operator<<(std::ostream &stream, const tile_with_position_t &tile)
+std::ostream &operator<<(std::ostream &stream, const Tile::tile_export_t &tile)
 {
   // number (1-8), empty (0) or mine (-1)
   switch (tile.type)
@@ -22,7 +22,7 @@ std::ostream &operator<<(std::ostream &stream, const tile_with_position_t &tile)
   return stream;
 }
 
-std::ostream &operator<<(std::ostream &stream, const tile_t &tile)
+std::ostream &operator<<(std::ostream &stream, const Tile &tile)
 {
   stream << tile.is_mine ? "Mine(" : "Field(";
   stream << "state=" << tile.is_revealed ? "revealed" : (tile.is_flagged ? "flagged" : "untouched");
@@ -35,19 +35,19 @@ std::ostream &operator<<(std::ostream &stream, const tile_t &tile)
   return stream;
 }
 
-std::ostream &operator<<(std::ostream &stream, const tile_position_t &tile_pos)
+std::ostream &operator<<(std::ostream &stream, const Tile::tile_position_t &tile_pos)
 {
   stream << "Tile @ (row=" << tile_pos.row << "|col=" << tile_pos.col << ')';
 
   return stream;
 }
 
-inline bool operator==(const tile_position_t &left, const tile_position_t &right)
+inline bool operator==(const Tile::tile_position_t &left, const Tile::tile_position_t &right)
 {
   return left.row == right.row && left.col == right.col;
 }
 
-inline bool operator<(const tile_position_t &left, const tile_position_t &right)
+inline bool operator<(const Tile::tile_position_t &left, const Tile::tile_position_t &right)
 {
   if (left.row == right.row)
   {
@@ -57,12 +57,20 @@ inline bool operator<(const tile_position_t &left, const tile_position_t &right)
   return left.row < right.row;
 }
 
-std::ostream &operator<<(std::ostream &stream, const tile_offset_t &tile_offset)
+std::ostream &operator<<(std::ostream &stream, const Tile::tile_offset_t &tile_offset)
 {
   stream << "Offset by (rows=" << tile_offset.rows << "|cols=" << tile_offset.cols << ')';
 
   return stream;
 }
+
+inline Tile::tile_export_t Tile::exportTileAt(const Tile::tile_position_t &tile_position)
+{
+  tile_export_t tile{tile_position.row, tile_position.col, this->is_mine ? tile_export_t::TYPE_MINE : this->nr_surrounding_mines};
+
+  return tile;
+}
+
 
 }
 }
