@@ -39,7 +39,7 @@ public:
   friend inline std::ostream &operator<<(std::ostream &stream, const Tile &tile);
   inline tile_export_t exportTileAt(const tile_position_t &tile_position);
 
-private:
+public:
   // semi constant
   bool is_mine = false;
   uint8_t nr_surrounding_mines = 0u;

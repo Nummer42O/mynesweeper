@@ -2,7 +2,7 @@
 
 #include "debug.hpp"
 #include "defines.hpp"
-#include "structs.hpp"
+#include "tile.hpp"
 
 #include <cstdlib>
 #include <cstdint>
@@ -26,9 +26,9 @@ private:
    *
    * @returns true if the loop for be exited, false otherwise
    */
-  typedef bool (*for_surrounding_tiles_callback_t)(tile::tile_t &tile, void *user_data);
+  typedef bool (*for_surrounding_tiles_callback_t)(tile::Tile &tile, void *user_data);
 
-  typedef std::vector<tile::tile_with_position_t> cascade_t;
+  typedef std::vector<tile::Tile::tile_export_t> cascade_t;
 
 public:
   /* #region minefield generation */
@@ -178,7 +178,7 @@ private:
   void revealTileInternal(
     index_t row,
     index_t col,
-    std::vector<tile::tile_with_position_t> &o_revealed_fields,
+    std::vector<tile::Tile::tile_export_t> &o_revealed_fields,
     bool &o_has_revealed_mine
   );
 
@@ -225,7 +225,7 @@ private:
    * @return true if moves are available, false otherwise
    */
   static inline bool checkTileHasAvailableMoves(
-    const tile::tile_t &tile
+    const tile::Tile &tile
   );
 
   /* #endregion*/
@@ -248,7 +248,7 @@ private:
    *
    * @returns the selected tile
    */
-  inline tile::tile_t &getTile(
+  inline tile::Tile &getTile(
     index_t row,
     index_t col
   );
@@ -262,12 +262,12 @@ private:
   index_t nr_of_mines;
 
   index_t field_size;
-  std::vector<tile::tile_t> field;
+  std::vector<tile::Tile> field;
   bool field_initialized = false;
 
-  static tile::tile_t default_tile;
-  static const std::array<tile::tile_offset_t, 8ul> offsets;
-  static const std::array<tile::tile_offset_t, 4ul> directions;
+  static tile::Tile default_tile;
+  static const std::array<tile::Tile::tile_offset_t, 8ul> offsets;
+  static const std::array<tile::Tile::tile_offset_t, 4ul> directions;
 };
 
 }
